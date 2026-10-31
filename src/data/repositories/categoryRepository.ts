@@ -4,6 +4,7 @@
 
 import { db } from '../db/schema';
 import type { CropCategory, CropCategoryType } from '@/domain/contracts/types';
+import { newId } from '@/lib/id';
 
 export const categoryRepository = {
   /**
@@ -27,7 +28,7 @@ export const categoryRepository = {
     const now = new Date().toISOString();
     const category: CropCategory = {
       ...data,
-      id: crypto.randomUUID(),
+      id: newId(),
       createdAt: now,
       updatedAt: now
     };

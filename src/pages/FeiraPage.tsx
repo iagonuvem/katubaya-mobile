@@ -11,10 +11,10 @@ import { feiraStatus, stockGroups, type FarmData } from '@/domain/rules/farm';
 import { generateAvailabilityMessage, itemDisplayName } from '@/domain/rules/availability';
 import type { AvailabilityItem } from '@/domain/contracts/types';
 import { generateList, sendList, updateList } from '@/data/actions';
-import { GameToast, ScreenHeader } from '@/components/game/Shell';
+import { ScreenHeader } from '@/components/game/Shell';
 import { Icon } from '@/components/game/Icon';
 import { Loading, lifeLabel } from '@/components/game/bits';
-import { showToast } from '@/components/game/toast';
+import { showToast, useToastOffset } from '@/components/game/toast';
 import { fmtNum, fmtQty, fmtUnit, fmtWeekdayDay } from '@/lib/format';
 
 export default function FeiraPage() {
@@ -27,6 +27,7 @@ export default function FeiraPage() {
 function Feira({ data, now }: { data: FarmData; now: Date }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
+  useToastOffset(112); // the fixed copy bar is taller than the nav
   const list = data.list;
   const status = feiraStatus(data, now);
   const groups = stockGroups(data, now);
@@ -122,7 +123,6 @@ function Feira({ data, now }: { data: FarmData; now: Date }) {
         )}
       </main>
 
-      <GameToast bottom={112} />
       <div className="fixed bottom-0 left-1/2 z-40 w-full max-w-[480px] -translate-x-1/2 border-t border-line bg-surface-raised px-4 pt-3.5" style={{ paddingBottom: 'calc(24px + var(--safe-area-bottom))' }}>
         <button type="button" className="kb-tap kb-tap-go" onClick={copy}><Icon name="copy" size={22} />{t('feira.copy')}</button>
       </div>

@@ -28,6 +28,7 @@ import type {
   Planting,
   Zone,
 } from '@/domain/contracts/types';
+import { newId } from '@/lib/id';
 
 const stamp = () => {
   const now = new Date().toISOString();
@@ -50,7 +51,7 @@ export async function logProduction({ shelfDays, signals, ...input }: LogProduct
   const result = await harvestRepository.create(input);
   if (signals && input.zoneId && Object.keys(signals).length > 0) {
     await db.observations.add({
-      id: crypto.randomUUID(), zoneId: input.zoneId, observedAt: result.harvest.harvestedAt, harvestEventId: result.harvest.id, ...signals, ...stamp(),
+      id: newId(), zoneId: input.zoneId, observedAt: result.harvest.harvestedAt, harvestEventId: result.harvest.id, ...signals, ...stamp(),
     });
   }
   return result;
@@ -69,11 +70,11 @@ export function processStock(input: { cropId: string; unit: Crop['defaultUnit'];
 // ============================================================================
 
 export async function saveObservation(zoneId: string, fields: Partial<Observation>): Promise<void> {
-  await db.observations.add({ id: crypto.randomUUID(), zoneId, observedAt: new Date().toISOString(), ...fields, ...stamp() });
+  await db.observations.add({ id: newId(), zoneId, observedAt: new Date().toISOString(), ...fields, ...stamp() });
 }
 
 export async function createZone(zone: Omit<Zone, 'id' | 'createdAt' | 'updatedAt' | 'sortOrder'>): Promise<string> {
-  const id = crypto.randomUUID();
+  const id = newId();
   const last = await db.zones.orderBy('sortOrder').last();
   await db.zones.add({ ...zone, id, sortOrder: (last?.sortOrder ?? -1) + 1, ...stamp() });
   return id;
@@ -115,7 +116,7 @@ export async function plant(zoneId: string, cells: Record<number, string>, plant
     for (const [cropId, list] of byCrop) {
       const layer = crops.get(cropId)?.layer ?? 'baixo';
       const planting: Planting = {
-        id: crypto.randomUUID(), zoneId, cropId, layer, cells: list.sort((a, b) => a - b), countUnit: COUNT_UNIT[layer], plantedAt,
+        id: newId(), zoneId, cropId, layer, cells: list.sort((a, b) => a - b), countUnit: COUNT_UNIT[layer], plantedAt,
         animalGroupId: layer === 'pasto' ? animalGroupId : undefined, ...stamp(),
       };
       await db.plantings.add(planting);
@@ -143,7 +144,7 @@ export async function generateList(windowId: 'this' | 'next', previous?: Availab
     ...item, isIncluded: !off.has(`${item.cropId}:${item.cultivarId ?? ''}`),
   }));
   const list: AvailabilityList = {
-    id: crypto.randomUUID(),
+    id: newId(),
     windowId,
     items,
     headerText: config?.defaultHeaderText || undefined,
@@ -171,7 +172,19 @@ export async function copyText(text: string): Promise<boolean> {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
-    return false;
+    // navigator.clipboard is undefined over plain http (phone on the LAN); the old command still copies
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length); // iOS Safari ignores select() alone
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch { ok = false; }
+    ta.remove();
+    return ok;
   }
 }
 
@@ -234,7 +247,7 @@ export async function deleteCrop(id: string): Promise<void> {
 }
 
 export async function addCultivar(cropId: string, name: string, shelfLifeDaysOverride?: number): Promise<void> {
-  await db.cultivars.add({ id: crypto.randomUUID(), cropId, name: name.trim(), shelfLifeDaysOverride, ...stamp() });
+  await db.cultivars.add({ id: newId(), cropId, name: name.trim(), shelfLifeDaysOverride, ...stamp() });
 }
 
 export async function deleteCultivar(id: string): Promise<void> {

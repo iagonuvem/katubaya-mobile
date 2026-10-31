@@ -8,6 +8,7 @@ import { lotRepository } from './lotRepository';
 import { cropRepository } from './cropRepository';
 import { inventoryRepository } from './inventoryRepository';
 import { planFifoConsumption } from '@/domain/rules/processing';
+import { newId } from '@/lib/id';
 
 export interface CreateHarvestInput {
   cropId: string;
@@ -51,10 +52,10 @@ export const harvestRepository = {
    */
   async create(input: CreateHarvestInput): Promise<{ harvest: HarvestEvent; lotId: string }> {
     const now = new Date().toISOString();
-    const lotId = crypto.randomUUID();
+    const lotId = newId();
     
     const harvest: HarvestEvent = {
-      id: crypto.randomUUID(),
+      id: newId(),
       cropId: input.cropId,
       cultivarId: input.cultivarId,
       zoneId: input.zoneId,

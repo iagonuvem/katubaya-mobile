@@ -8,7 +8,7 @@ import { calendarDays, plotZones, type NoticeCategory } from '@/domain/rules/far
 import { APP_VERSION } from '@/domain/contracts';
 import { settingsRepository } from '@/data/repositories';
 import { exportPack } from '@/data/actions';
-import { GameToast, ScreenHeader } from '@/components/game/Shell';
+import { ScreenHeader } from '@/components/game/Shell';
 import { Icon } from '@/components/game/Icon';
 import { Loading } from '@/components/game/bits';
 import { showToast } from '@/components/game/toast';
@@ -128,7 +128,6 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between gap-2 text-[15px]"><span className="text-ink-muted">{t('settings.account')}</span><span className="text-right">{t('settings.noAccount')}</span></div>
         <Link to="/regras" className="kb-inline text-[15px]">{t('settings.rules')}</Link>
       </section>
-      <GameToast bottom={24} />
     </main>
   );
 }

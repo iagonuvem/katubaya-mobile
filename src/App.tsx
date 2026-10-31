@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { settingsRepository } from '@/data/repositories';
-import { MochilaProvider } from '@/components/game/Shell';
+import { GameToast, MochilaProvider } from '@/components/game/Shell';
 import MapPage from './pages/MapPage';
 const HarvestPage = lazy(() => import('./pages/HarvestPage'));
 const PaiolPage = lazy(() => import('./pages/PaiolPage'));
@@ -80,6 +80,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>
+        <GameToast />
       </MochilaProvider>
     </BrowserRouter>
   </ThemeProvider>

@@ -14,6 +14,7 @@ import type {
 import { lotRepository } from './lotRepository';
 import { cropRepository } from './cropRepository';
 import { getExpirationStatus, getDaysUntilExpiry } from '@/domain/rules/expiration';
+import { newId } from '@/lib/id';
 
 export interface CreateAdjustmentInput {
   lotId: string;
@@ -35,7 +36,7 @@ export const inventoryRepository = {
     
     const now = new Date().toISOString();
     const adjustment: InventoryAdjustment = {
-      id: crypto.randomUUID(),
+      id: newId(),
       lotId: input.lotId,
       cropId: lot.cropId,
       quantityDelta: input.quantityDelta,

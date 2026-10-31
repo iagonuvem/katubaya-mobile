@@ -13,6 +13,7 @@ import {
   createAvailabilityItemsFromSnapshot, 
   generateAvailabilityMessage 
 } from '@/domain/rules/availability';
+import { newId } from '@/lib/id';
 
 const DEFAULT_CONFIG_ID = 'availability-config';
 
@@ -47,7 +48,7 @@ export const availabilityRepository = {
     const items = createAvailabilityItemsFromSnapshot(snapshot);
     
     const list: AvailabilityList = {
-      id: crypto.randomUUID(),
+      id: newId(),
       windowName: 'Esta semana',
       items,
       headerText: config?.defaultHeaderText,

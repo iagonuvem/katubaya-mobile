@@ -6,6 +6,7 @@
 import { db } from '../db/schema';
 import type { AnimalGroup, AnimalAdjustment, AnimalAdjustmentReason } from '@/domain/contracts/types';
 import { harvestRepository, type CreateHarvestInput } from './harvestRepository';
+import { newId } from '@/lib/id';
 
 export type CreateAnimalGroupInput = Pick<AnimalGroup, 'name' | 'species' | 'zoneId' | 'notes'> & {
   headcount: number;
@@ -37,7 +38,7 @@ export const animalRepository = {
   async create(input: CreateAnimalGroupInput): Promise<AnimalGroup> {
     const now = new Date().toISOString();
     const group: AnimalGroup = {
-      id: crypto.randomUUID(),
+      id: newId(),
       name: input.name,
       species: input.species,
       zoneId: input.zoneId,
@@ -83,7 +84,7 @@ export const animalRepository = {
 
         const now = new Date().toISOString();
         const adjustment: AnimalAdjustment = {
-          id: crypto.randomUUID(),
+          id: newId(),
           groupId: group.id,
           delta: input.delta,
           reason: input.reason,

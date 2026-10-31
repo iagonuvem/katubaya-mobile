@@ -10,6 +10,7 @@ import type {
   InventorySnapshotItem,
   UnitType 
 } from '../contracts/types';
+import { newId } from '@/lib/id';
 
 /**
  * Map crop names to emojis for WhatsApp message
@@ -163,7 +164,7 @@ export function createAvailabilityItemsFromSnapshot(
   return snapshot.items
     .filter(item => item.totalQuantity > 0)
     .map((item, index) => ({
-      id: crypto.randomUUID(),
+      id: newId(),
       cropId: item.cropId,
       cropName: item.cropName,
       cultivarId: item.cultivarId,

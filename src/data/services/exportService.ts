@@ -10,6 +10,7 @@ import { inventoryRepository } from '@/data/repositories/inventoryRepository';
 import { availabilityRepository } from '@/data/repositories/availabilityRepository';
 import type { AvailabilityList, AvailabilityPack, ExportManifest } from '@/domain/contracts/types';
 import { APP_VERSION, SCHEMA_VERSION } from '@/domain/contracts';
+import { newId } from '@/lib/id';
 
 export type ExportType = 'availability' | 'full';
 
@@ -62,7 +63,7 @@ export async function exportZip(type: ExportType, farmName?: string): Promise<Ex
     ]);
 
   const availabilityList: AvailabilityList = current ?? {
-    id: crypto.randomUUID(),
+    id: newId(),
     items: [],
     isStale: true,
     inventorySnapshotAt: now,
@@ -74,7 +75,7 @@ export async function exportZip(type: ExportType, farmName?: string): Promise<Ex
     schemaVersion: SCHEMA_VERSION,
     appVersion: APP_VERSION,
     exportedAt: now,
-    packId: crypto.randomUUID(),
+    packId: newId(),
     packType: full ? 'full_history' : 'availability',
     farmName
   };
