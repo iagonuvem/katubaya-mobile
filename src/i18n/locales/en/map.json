@@ -94,7 +94,6 @@
     "stallCount": "{{inList}} on the list · {{total}} products",
     "out": "Off",
     "showAll": "See All Products ({{count}})",
-    "showLess": "Show Less",
     "updateList": "Update List",
     "listOk": "List Up to Date",
     "editSend": "Edit and Send",

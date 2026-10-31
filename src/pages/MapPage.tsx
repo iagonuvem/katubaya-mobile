@@ -36,7 +36,7 @@ import {
 import { itemDisplayName } from '@/domain/rules/availability';
 import type { AnimalGroup, Zone } from '@/domain/contracts/types';
 import { generateList, recordRitualWeek, sendList } from '@/data/actions';
-import { BottomNav, BottomSheet, GameToast, SheetHead, sprite } from '@/components/game/Shell';
+import { BottomNav, BottomSheet, SheetHead, sprite } from '@/components/game/Shell';
 import { Icon, type IconName } from '@/components/game/Icon';
 import { showToast } from '@/components/game/toast';
 import { cropDot, categoryDot } from '@/components/game/crop';
@@ -278,7 +278,6 @@ function FarmMap({ data, now }: { data: FarmData; now: Date }) {
       {sel?.kind === 'novo' && <NovoSheet {...ctx} />}
       {sel?.kind === 'industria' && <IndustriaSheet {...ctx} />}
 
-      <GameToast bottom={104} />
       <BottomNav active="sitio" onSend={send} />
     </div>
   );
@@ -503,7 +502,6 @@ function lifeShort(t: (k: string, o?: Record<string, unknown>) => string, life: 
 
 function FeiraSheet({ data, now, close, feira, groups }: SheetCtx) {
   const { t } = useTranslation();
-  const [all, setAll] = useState(false);
   const list = data.list;
   const stale = feira.state === 'desatualizada';
   const tone: Tone = feira.state === 'pronta' || feira.state === 'enviada' ? 'canopy' : 'amber';
@@ -557,7 +555,7 @@ function FeiraSheet({ data, now, close, feira, groups }: SheetCtx) {
         <span className="kb-sub">{t('map.stallCount', { inList, total: rows.length })}</span>
       </div>
       <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-        {(all ? rows : rows.slice(0, 3)).map(r => (
+        {rows.slice(0, 3).map(r => (
           <li key={r.key} className="flex items-center gap-2.5 rounded-[14px] px-3 py-2.5"
             style={r.out ? { background: 'transparent', border: '1px dashed var(--line-strong)' } : { background: 'var(--surface)' }}>
             <span className="kb-dot" style={{ background: r.dot }} />
@@ -572,12 +570,11 @@ function FeiraSheet({ data, now, close, feira, groups }: SheetCtx) {
           </li>
         ))}
       </ul>
-      {rows.length > 3 && (
-        <button type="button" onClick={() => setAll(a => !a)} aria-expanded={all}
-          className="min-h-11 rounded-xl border-[1.5px] border-dashed border-line-strong bg-transparent text-[15px] font-medium text-ink">
-          {all ? t('map.showLess') : t('map.showAll', { count: rows.length })}
-        </button>
-      )}
+      <Link to="/produtos"
+        className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-line-strong bg-transparent text-[15px] font-medium text-ink no-underline">
+        {t('map.showAll', { count: data.crops.length })}
+        <Icon name="chevron" size={18} strokeWidth={2} />
+      </Link>
       <div className="grid grid-cols-2 gap-2.5">
         <button type="button" className="kb-tap kb-tap-alt kb-tap-md" onClick={update} aria-disabled={!stale && !!list}>
           {stale || !list ? t('map.updateList') : t('map.listOk')}

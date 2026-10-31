@@ -7,7 +7,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Icon, type IconName } from './Icon';
-import { useToast } from './toast';
+import { useToast, useToastOffset } from './toast';
 
 // ============================================================================
 // Header
@@ -62,7 +62,7 @@ const MOCHILA: { to: string; key: string; icon: IconName; tone: 'amber' | 'canop
   { to: '/paiol/ajustar', key: 'adjust', icon: 'box', tone: 'amber' },
   { to: '/animais', key: 'animals', icon: 'cattle', tone: 'canopy' },
   { to: '/processar', key: 'process', icon: 'process', tone: 'river' },
-  { to: '/produtos/nova', key: 'product', icon: 'cards', tone: 'river' },
+  { to: '/produtos', key: 'product', icon: 'cards', tone: 'river' },
   { to: '/feira/banca', key: 'stall', icon: 'stall', tone: 'canopy' },
   { to: '/talhao/novo', key: 'zone', icon: 'pin', tone: 'muted' },
 ];
@@ -188,6 +188,7 @@ export function SheetHead({ id, title, sub, onClose }: { id: string; title: Reac
 export function BottomNav({ active, onSend }: { active?: 'sitio'; onSend?: () => void }) {
   const { t } = useTranslation();
   const { open } = useMochila();
+  useToastOffset(104);
   const send = (
     <>
       <Icon name="copy" />
@@ -214,11 +215,12 @@ export function BottomNav({ active, onSend }: { active?: 'sitio'; onSend?: () =>
 // Toast
 // ============================================================================
 
-export function GameToast({ bottom = 104 }: { bottom?: number }) {
+/** Rendered once in App; sits 24px up, or above the bottom bar when one sets --toast-bottom */
+export function GameToast() {
   const toast = useToast();
   if (!toast) return null;
   return (
-    <div key={toast.id} role="status" className="kb-toast" style={{ bottom: `calc(${bottom}px + var(--safe-area-bottom))` }}>
+    <div key={toast.id} role="status" className="kb-toast" style={{ bottom: 'calc(var(--toast-bottom, 24px) + var(--safe-area-bottom))' }}>
       <Icon name="check" size={18} strokeWidth={2} />
       {toast.text}
     </div>
