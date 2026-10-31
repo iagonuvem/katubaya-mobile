@@ -1,0 +1,108 @@
+{
+  "notices": {
+    "title": "Notificações",
+    "back": "Voltar ao mapa",
+    "unread_one": "{{count}} nova · geradas no celular, sem internet",
+    "unread_other": "{{count}} novas · geradas no celular, sem internet",
+    "allRead": "Tudo lido · geradas no celular, sem internet",
+    "readAll": "Marcar lidas",
+    "filterLabel": "Filtrar",
+    "filter": {
+      "all": "Tudo",
+      "paiol": "Paiol",
+      "talhao": "Talhões",
+      "animal": "Animais",
+      "feira": "Feira",
+      "bau": "Baú"
+    },
+    "group": {
+      "now": "Hoje",
+      "week": "Esta semana"
+    },
+    "new": "Nova",
+    "none": "Nada por aqui. O sítio está em dia.",
+    "choose": "Escolher o que avisar",
+    "kind": {
+      "paiol": "Paiol",
+      "feira": "Feira",
+      "bau": "Baú"
+    },
+    "lotToday": {
+      "title": "{{name}} vence hoje",
+      "body": "{{qty}} no paiol. Já saiu da feira; registre se vendeu, comeu ou perdeu."
+    },
+    "lotExpired": {
+      "title_one": "{{name}} venceu há {{count}} dia",
+      "title_other": "{{name}} venceu há {{count}} dias"
+    },
+    "lotSoon": {
+      "title_one": "{{name}} vence amanhã",
+      "title_other": "{{name}} vence em {{count}} dias",
+      "body": "{{qty}} do lote de {{date}}.",
+      "bodyProcess": "{{qty}} do lote de {{date}}. Ainda dá para processar."
+    },
+    "plotReady": {
+      "title": "{{name}} pronta para colher",
+      "body_one": "Última colheita aqui foi há {{count}} dia.",
+      "body_other": "Última colheita aqui foi há {{count}} dias.",
+      "bodyFirst": "Pelo ciclo da carta, chegou a hora da primeira colheita.",
+      "body_zero": "A colheita de hoje já entrou no paiol, e ainda tem mais pronta."
+    },
+    "plotObserve": {
+      "title_one": "Sem observação há {{count}} dia",
+      "title_other": "Sem observação há {{count}} dias",
+      "titleNever": "Talhão ainda não observado",
+      "body": "Uma olhada de 10 minutos fecha o passo Observar."
+    },
+    "plotDry": {
+      "title": "Solo seco no talhão",
+      "body": "Na última observação o solo estava seco. Regue e observe de novo."
+    },
+    "plotEmpty": {
+      "title_one": "Talhão vazio há {{count}} semana",
+      "title_other": "Talhão vazio há {{count}} semanas",
+      "body": "Plante algo ou cubra o solo."
+    },
+    "plantSoon": {
+      "title": "{{name}} perto da colheita",
+      "body_one": "Plantado há {{weeks}} semanas. Pelo ciclo da carta, a colheita começa em cerca de {{count}} dia.",
+      "body_other": "Plantado há {{weeks}} semanas. Pelo ciclo da carta, a colheita começa em cerca de {{count}} dias."
+    },
+    "feiraStale": {
+      "title": "Feira desatualizada",
+      "body_one": "{{count}} mudança no paiol depois da lista. A mensagem do WhatsApp não bate com o paiol.",
+      "body_other": "{{count}} mudanças no paiol depois da lista. A mensagem do WhatsApp não bate com o paiol."
+    },
+    "feiraNone": {
+      "title": "Monte a feira da semana",
+      "body": "O paiol tem produto. Uma lista pronta vira mensagem para o WhatsApp."
+    },
+    "milking": {
+      "title": "Ordenha de hoje não registrada",
+      "body": "Ontem foram {{qty}}. Registre quando terminar."
+    },
+    "collect": {
+      "title": "{{name}}: coleta de hoje não registrada",
+      "body": "Média de {{qty}} por dia nesta semana."
+    },
+    "bau": {
+      "title_one": "Último baú há {{count}} dia",
+      "title_other": "Último baú há {{count}} dias",
+      "titleNever": "Nenhum baú guardado ainda",
+      "body": "Guarde uma cópia antes de domingo para fechar o ritual."
+    },
+    "cta": {
+      "adjust": "Ajustar",
+      "process": "Processar",
+      "openStock": "Abrir paiol",
+      "harvest": "Colher",
+      "observe": "Observar",
+      "seePlot": "Ver talhão",
+      "plant": "Plantar",
+      "updateFeira": "Atualizar feira",
+      "milk": "Registrar Ordenha",
+      "collect": "Coletar Ovos",
+      "backup": "Guardar baú"
+    }
+  }
+}

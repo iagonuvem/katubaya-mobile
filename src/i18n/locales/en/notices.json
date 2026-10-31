@@ -1,0 +1,108 @@
+{
+  "notices": {
+    "title": "Notifications",
+    "back": "Back to the map",
+    "unread_one": "{{count}} new · made on this phone, no internet",
+    "unread_other": "{{count}} new · made on this phone, no internet",
+    "allRead": "All read · made on this phone, no internet",
+    "readAll": "Mark read",
+    "filterLabel": "Filter",
+    "filter": {
+      "all": "All",
+      "paiol": "Storehouse",
+      "talhao": "Plots",
+      "animal": "Animals",
+      "feira": "Market",
+      "bau": "Chest"
+    },
+    "group": {
+      "now": "Today",
+      "week": "This week"
+    },
+    "new": "New",
+    "none": "Nothing here. The farm is up to date.",
+    "choose": "Choose what to be told about",
+    "kind": {
+      "paiol": "Storehouse",
+      "feira": "Market",
+      "bau": "Chest"
+    },
+    "lotToday": {
+      "title": "{{name}} expires today",
+      "body": "{{qty}} in the storehouse. It already left the market list; log whether you sold, ate or lost it."
+    },
+    "lotExpired": {
+      "title_one": "{{name}} expired {{count}} day ago",
+      "title_other": "{{name}} expired {{count}} days ago"
+    },
+    "lotSoon": {
+      "title_one": "{{name}} expires tomorrow",
+      "title_other": "{{name}} expires in {{count}} days",
+      "body": "{{qty}} from the lot of {{date}}.",
+      "bodyProcess": "{{qty}} from the lot of {{date}}. Still time to process it."
+    },
+    "plotReady": {
+      "title": "{{name}} ready to harvest",
+      "body_one": "Last harvest here was {{count}} day ago.",
+      "body_other": "Last harvest here was {{count}} days ago.",
+      "bodyFirst": "By the card's cycle, it is time for the first harvest.",
+      "body_zero": "Today's harvest is already in the storehouse, and there is more ready."
+    },
+    "plotObserve": {
+      "title_one": "Not observed for {{count}} day",
+      "title_other": "Not observed for {{count}} days",
+      "titleNever": "Plot not observed yet",
+      "body": "A 10 minute look closes the Observe step."
+    },
+    "plotDry": {
+      "title": "Dry soil in the plot",
+      "body": "The soil was dry at the last look. Water it and look again."
+    },
+    "plotEmpty": {
+      "title_one": "Plot empty for {{count}} week",
+      "title_other": "Plot empty for {{count}} weeks",
+      "body": "Plant something or cover the soil."
+    },
+    "plantSoon": {
+      "title": "{{name}} close to harvest",
+      "body_one": "Planted {{weeks}} weeks ago. By the card's cycle, harvest starts in about {{count}} day.",
+      "body_other": "Planted {{weeks}} weeks ago. By the card's cycle, harvest starts in about {{count}} days."
+    },
+    "feiraStale": {
+      "title": "Market list out of date",
+      "body_one": "{{count}} storehouse change after the list. The WhatsApp message no longer matches the storehouse.",
+      "body_other": "{{count}} storehouse changes after the list. The WhatsApp message no longer matches the storehouse."
+    },
+    "feiraNone": {
+      "title": "Build this week's market",
+      "body": "The storehouse has products. A ready list becomes a WhatsApp message."
+    },
+    "milking": {
+      "title": "Today's milking not logged",
+      "body": "Yesterday it was {{qty}}. Log it when you finish."
+    },
+    "collect": {
+      "title": "{{name}}: today's collection not logged",
+      "body": "Average of {{qty}} a day this week."
+    },
+    "bau": {
+      "title_one": "Last chest {{count}} day ago",
+      "title_other": "Last chest {{count}} days ago",
+      "titleNever": "No chest saved yet",
+      "body": "Save a copy before Sunday to close the ritual."
+    },
+    "cta": {
+      "adjust": "Adjust",
+      "process": "Process",
+      "openStock": "Open storehouse",
+      "harvest": "Harvest",
+      "observe": "Observe",
+      "seePlot": "See plot",
+      "plant": "Plant",
+      "updateFeira": "Update market",
+      "milk": "Log Milking",
+      "collect": "Collect Eggs",
+      "backup": "Save chest"
+    }
+  }
+}

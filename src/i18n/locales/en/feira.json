@@ -1,0 +1,43 @@
+{
+  "feira": {
+    "title": "Market",
+    "stall": "Stall",
+    "period": "Period",
+    "window": { "this": "This week", "next": "Next week" },
+    "none": "No list yet. Build the market from what is in the storehouse.",
+    "staleHarvests_one": "{{count}} harvest came in after the last list. Update it so the market matches the storehouse.",
+    "staleHarvests_other": "{{count}} harvests came in after the last list. Update it so the market matches the storehouse.",
+    "stale_one": "{{count}} storehouse change after the last list. Update it so the market matches the storehouse.",
+    "stale_other": "{{count}} storehouse changes after the last list. Update it so the market matches the storehouse.",
+    "update": "Update the market",
+    "build": "Build the market",
+    "fresh": "Market up to date.",
+    "freshMeta_one": "Made {{when}}. {{count}} item on the list.",
+    "freshMeta_other": "Made {{when}}. {{count}} items on the list.",
+    "tapHint": "Tap to take off or put on",
+    "inStock": "Fresh · {{qty}} in the storehouse",
+    "include": "Include {{name}}",
+    "less": "Less {{name}}",
+    "more": "More {{name}}",
+    "preview": "How it looks on WhatsApp",
+    "copy": "Copy to WhatsApp",
+    "copied": "Copied. Ritual: Send done."
+  },
+  "stall": {
+    "title": "Set up the stall",
+    "back": "Back to the market",
+    "hero": "Your stall's style shows on every list.",
+    "farm": "Farm details",
+    "farmName": "Farm name",
+    "contact": "Contact",
+    "message": "Your message",
+    "header": "Header",
+    "headerPlaceholder": "This week's market",
+    "headerHint": "Leave blank to use the default.",
+    "footer": "Footer",
+    "footerHint": "Delivery times, payment methods.",
+    "after": "After saving, update the market to see the change.",
+    "save": "Save stall",
+    "saved": "Stall saved."
+  }
+}

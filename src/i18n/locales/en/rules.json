@@ -1,0 +1,59 @@
+{
+  "rules": {
+    "title": "The rules of the game",
+    "intro": "The app becomes a farm game: the map is home, the weekly ritual is the mission and every feature is a place or a move. Nobody competes with anybody; the only score is your own farm growing.",
+    "ritual": {
+      "title": "Weekly ritual",
+      "text": "The mission is the week's flow. Each step lights up by itself when the action happens.",
+      "observar": "Observe the forest", "observarHint": "signs while harvesting",
+      "colher": "Harvest", "colherHint": "3 taps",
+      "paiol": "Tidy the storehouse", "paiolHint": "stock + adjustments",
+      "feira": "Build the market", "feiraHint": "availability",
+      "mandar": "Send on WhatsApp", "mandarHint": "copy the message",
+      "guardar": "Save the chest", "guardarHint": "export a pack"
+    },
+    "tree": {
+      "title": "The farm tree",
+      "text": "Each closed ritual grows a branch. A skipped week freezes the tree; nothing withers, nothing is lost.",
+      "semente": "Seed", "broto": "Sprout", "muda": "Sapling", "arvore": "Tree",
+      "at_one": "{{count}} ritual", "at_other": "{{count}} rituals",
+      "yours_one": "Your tree: {{stage}}, with {{count}} closed ritual. It shows on the map's free land.",
+      "yours_other": "Your tree: {{stage}}, with {{count}} closed rituals. It shows on the map's free land."
+    },
+    "broto": {
+      "title": "Broto, the guide",
+      "text": "Says the next step in one sentence, unhurried and without exclamation marks.",
+      "calm": "All up to date. Enjoy the shade.",
+      "mood": { "tranquilo": "All up to date", "explicando": "Next step", "comemorando": "Step done", "avisando": "Expiring" },
+      "alt": { "tranquilo": "Broto at ease", "explicando": "Broto explaining", "comemorando": "Broto celebrating", "avisando": "Broto warning" }
+    },
+    "fresh": {
+      "title": "Freshness in the storehouse",
+      "text": "Shelf life became a life bar on every crate, always with the word next to it.",
+      "fresh": "Fresh · more than 3 days",
+      "soon": "Expiring · 1 to 3 days",
+      "out": "Expires today or expired",
+      "note": "An expired crate leaves the market list and asks for an adjustment: loss, eaten or gift."
+    },
+    "seeds": {
+      "title": "Saved seeds",
+      "text": "Personal achievements. They stay in the chest, never on a public list.",
+      "firstHarvest": "First harvest",
+      "feirasSent_one": "{{count}} market sent", "feirasSent_other": "{{count}} markets sent",
+      "collection_one": "Collection with {{count}} card", "collection_other": "Collection with {{count}} cards",
+      "firstBackup": "First chest saved",
+      "guild_one": "{{count}} role in the forest", "guild_other": "{{count}} roles in the forest",
+      "zeroLoss": "Zero loss this month",
+      "earned": " · earned",
+      "notYet": " · not yet"
+    },
+    "never": {
+      "title": "What the game never does",
+      "ranking": "Rankings, public scores or comparing farms.",
+      "countdown": "Countdowns, lost lives or streaks that reset.",
+      "account": "Ask for an account, internet, or send data out unless you export it.",
+      "truth": "Trade the storehouse's truth for points: quantities are always real.",
+      "hide": "Hide features: everything the app had is still one tap away."
+    }
+  }
+}

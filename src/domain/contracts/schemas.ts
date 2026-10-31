@@ -17,6 +17,7 @@ export const CropCategoryTypeSchema = z.enum([
   'nuts',
   'roots',
   'animal',
+  'forage',
   'custom'
 ]);
 
@@ -41,6 +42,8 @@ export const AdjustmentReasonSchema = z.enum([
   'correction',
   'processing'
 ]);
+
+export const LayerSchema = z.enum(['emergente', 'alto', 'medio', 'baixo', 'rasteiro', 'pasto']);
 
 export const ExpirationStatusSchema = z.enum(['fresh', 'expiring_soon', 'expired']);
 
@@ -70,12 +73,18 @@ export const CropSchema = BaseEntitySchema.extend({
   categoryId: z.string().uuid(),
   name: z.string().min(1).max(100),
   defaultUnit: UnitTypeSchema,
-  shelfLifeDaysDefault: z.number().int().min(1).max(365),
+  shelfLifeDaysDefault: z.number().int().min(0).max(365), // 0 = not set yet
   pricePerUnit: z.number().min(0).optional(),
   guildTags: z.array(z.string()).optional(),
   notes: z.string().max(500).optional(),
   isFavorite: z.boolean(),
-  lastUsedAt: z.string().datetime().optional()
+  lastUsedAt: z.string().datetime().optional(),
+  layer: LayerSchema.optional(),
+  cycleDays: z.number().int().min(1).optional(),
+  isForage: z.boolean().optional(),
+  species: z.enum(['cattle', 'poultry', 'swine', 'goat', 'sheep', 'bees', 'fish', 'other']).optional(),
+  animalYield: z.enum(['collect', 'slaughter']).optional(),
+  derivedFromCropId: z.string().optional()
 });
 
 export const CultivarSchema = BaseEntitySchema.extend({
@@ -89,10 +98,46 @@ export const CultivarSchema = BaseEntitySchema.extend({
 // ZONES
 // ============================================================================
 
+export const ZoneTypeSchema = z.enum(['canteiro', 'linha', 'agrofloresta', 'pomar', 'pasto', 'abrigo']);
+const Level3 = z.union([z.literal(0), z.literal(1), z.literal(2)]);
+
 export const ZoneSchema = BaseEntitySchema.extend({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
-  sortOrder: z.number().int().min(0)
+  sortOrder: z.number().int().min(0),
+  type: ZoneTypeSchema.optional(),
+  size: z.string().max(50).optional(),
+  areaM2: z.number().min(0).optional(),
+  gridRows: z.number().int().min(1).max(8).optional(),
+  mapHeight: z.number().min(40).max(400).optional(),
+  sun: z.enum(['full', 'partial', 'shade']).optional(),
+  water: z.enum(['irrigated', 'rain']).optional()
+});
+
+export const PlantingSchema = BaseEntitySchema.extend({
+  zoneId: z.string(),
+  cropId: z.string(),
+  cultivarId: z.string().optional(),
+  layer: LayerSchema,
+  cells: z.array(z.number().int().min(0)),
+  count: z.number().int().min(0).optional(),
+  countUnit: z.enum(['pes', 'covas', 'mudas', 'arvores', 'touceiras']),
+  plantedAt: z.string().datetime(),
+  endedAt: z.string().datetime().optional(),
+  animalGroupId: z.string().optional()
+});
+
+export const ObservationSchema = BaseEntitySchema.extend({
+  zoneId: z.string(),
+  observedAt: z.string().datetime(),
+  phase: z.enum(['vegetative', 'flowering', 'fruiting', 'dormant']).optional(),
+  pollinators: Level3.optional(),
+  pest: Level3.optional(),
+  disease: Level3.optional(),
+  soil: Level3.optional(),
+  notes: z.string().max(1000).optional(),
+  photo: z.string().optional(),
+  harvestEventId: z.string().optional()
 });
 
 // ============================================================================

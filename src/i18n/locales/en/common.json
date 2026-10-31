@@ -1,0 +1,89 @@
+{
+  "common": {
+    "close": "Close",
+    "back": "Back",
+    "change": "Change",
+    "optional": "(optional)",
+    "notes": "Notes",
+    "notesPlaceholder": "Notes about this production...",
+    "now": "Now",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "noZone": "No zone",
+    "noPrice": "No price",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "loading": "Loading the farm…",
+    "error": "Could not save. Try again.",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "heads_one": "{{count}} head",
+    "heads_other": "{{count}} heads"
+  },
+  "nav": {
+    "label": "Navigation",
+    "farm": "Farm",
+    "send": "Send",
+    "actions": "Quick actions"
+  },
+  "mochila": {
+    "title": "What are we doing?",
+    "produce": "Log Production",
+    "produceHint": "Harvest, milking, eggs or slaughter",
+    "adjust": "Adjust storehouse",
+    "adjustHint": "Sold, gave, ate or lost",
+    "animals": "Animal Lots",
+    "animalsHint": "Heads, births, sales and slaughter",
+    "process": "Process",
+    "processHint": "Milk into cheese, pork into sausage",
+    "product": "Add Product",
+    "productHint": "From the field or from animals",
+    "stall": "Set up the stall",
+    "stallHint": "Header, footer and market hours",
+    "zone": "New zone on the map",
+    "zoneHint": "Plot, bed or pasture"
+  },
+  "units": {
+    "kg_one": "kg", "kg_other": "kg",
+    "g_one": "g", "g_other": "g",
+    "unit_one": "pc", "unit_other": "pcs",
+    "bunch_one": "bunch", "bunch_other": "bunches",
+    "liter_one": "L", "liter_other": "L",
+    "ml_one": "ml", "ml_other": "ml",
+    "box_one": "box", "box_other": "boxes",
+    "bag_one": "bag", "bag_other": "bags",
+    "dozen_one": "doz", "dozen_other": "doz"
+  },
+  "species": {
+    "cattle": "Cattle", "poultry": "Poultry", "swine": "Pigs", "goat": "Goats",
+    "sheep": "Sheep", "bees": "Bees", "fish": "Fish", "other": "Other"
+  },
+  "layers": {
+    "emergente": "Emergent", "alto": "High", "medio": "Middle", "baixo": "Low", "rasteiro": "Ground", "pasto": "Pasture"
+  },
+  "plantUnits": {
+    "pes_one": "{{count}} plant", "pes_other": "{{count}} plants",
+    "covas_one": "{{count}} hole", "covas_other": "{{count}} holes",
+    "mudas_one": "{{count}} seedling", "mudas_other": "{{count}} seedlings",
+    "arvores_one": "{{count}} tree", "arvores_other": "{{count}} trees",
+    "touceiras_one": "{{count}} clump", "touceiras_other": "{{count}} clumps"
+  },
+  "zoneTypes": {
+    "canteiro": "Bed", "linha": "Row", "agrofloresta": "Agroforest", "pomar": "Orchard", "pasto": "Pasture", "abrigo": "Shelter"
+  },
+  "adjustReasons": {
+    "sold": "Sold", "consumed": "Eaten", "gift": "Gift", "damage": "Damage", "loss": "Loss", "correction": "Correction", "processing": "Process"
+  },
+  "animalReasons": {
+    "birth": "Birth", "purchase": "Purchase", "death": "Death", "sale": "Sale", "slaughter": "Slaughter", "correction": "Correction"
+  },
+  "life": {
+    "fresh": "Fresh · {{days}}",
+    "soon_one": "Expires tomorrow",
+    "soon_other": "Expires in {{count}} days",
+    "today": "Expires today",
+    "expired_one": "Expired {{count}} day ago",
+    "expired_other": "Expired {{count}} days ago"
+  }
+}

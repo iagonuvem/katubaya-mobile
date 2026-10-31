@@ -52,33 +52,3 @@ export function getExpirationStatus(
   
   return 'fresh';
 }
-
-/**
- * Get expiration status color for UI
- */
-export function getExpirationColor(status: ExpirationStatus): {
-  bg: string;
-  text: string;
-  border: string;
-} {
-  switch (status) {
-    case 'fresh':
-      return {
-        bg: 'bg-harvest-success/10',
-        text: 'text-harvest-success',
-        border: 'border-harvest-success'
-      };
-    case 'expiring_soon':
-      return {
-        bg: 'bg-harvest-warning/10',
-        text: 'text-harvest-warning',
-        border: 'border-harvest-warning'
-      };
-    case 'expired':
-      return {
-        bg: 'bg-harvest-expired/10',
-        text: 'text-harvest-expired',
-        border: 'border-harvest-expired'
-      };
-  }
-}

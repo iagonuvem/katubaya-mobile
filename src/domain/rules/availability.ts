@@ -119,52 +119,39 @@ export function formatPrice(price: number): string {
   return `R$ ${price.toFixed(2).replace('.', ',')}`;
 }
 
+const PRICE_SUFFIX: Record<UnitType, string> = {
+  kg: '/kg', g: '/g', liter: '/L', ml: '/ml', unit: ' a unid', bunch: ' o maço', dozen: ' a dúzia', box: ' a caixa', bag: ' o saco'
+};
+
+/** Display name of a stock line: crop plus variety ("Banana Prata") */
+export function itemDisplayName(item: Pick<AvailabilityItem, 'cropName' | 'cultivarName'>): string {
+  return item.cultivarName ? `${item.cropName} ${item.cultivarName}` : item.cropName;
+}
+
 /**
- * Generate deterministic WhatsApp availability message
- * Shows prices instead of quantities
+ * Deterministic WhatsApp message for a market list ("feira").
+ * The message is content for pt-BR customers, so it stays in Portuguese whatever the UI locale.
  */
 export function generateAvailabilityMessage(list: AvailabilityList): string {
-  const lines: string[] = [];
-  
-  // Header
-  const header = list.headerText || `🌿 Produtos Disponíveis${list.farmName ? ` - ${list.farmName}` : ''}`;
-  lines.push(header);
-  lines.push('━━━━━━━━━━━━━━━━━━━━━');
-  
-  // Window name if present
-  if (list.windowName) {
-    lines.push(`📅 ${list.windowName}`);
-    lines.push('');
-  }
-  
-  // Items (only included ones, sorted by sortOrder)
-  const includedItems = list.items
+  const when = list.windowId === 'next' ? 'da próxima semana' : 'desta semana';
+  const header = list.headerText?.trim()
+    || (list.farmName ? `*${list.farmName}* · Feira ${when}` : `Feira ${when}`);
+
+  const lines = list.items
     .filter(item => item.isIncluded && item.quantity > 0)
-    .sort((a, b) => a.sortOrder - b.sortOrder);
-  
-  for (const item of includedItems) {
-    const emoji = getCropEmoji(item.cropName);
-    const cultivar = item.cultivarName ? ` (${item.cultivarName})` : '';
-    const unit = formatUnit(item.unit, 1); // singular unit for price display
-    const priceText = item.pricePerUnit 
-      ? ` - ${formatPrice(item.pricePerUnit)}/${unit}`
-      : '';
-    
-    lines.push(`${emoji} ${item.cropName}${cultivar}${priceText}`);
-  }
-  
-  // Footer
-  lines.push('━━━━━━━━━━━━━━━━━━━━━');
-  
-  if (list.footerText) {
-    lines.push(list.footerText);
-  }
-  
-  if (list.contactInfo) {
-    lines.push(`📞 Contato: ${list.contactInfo}`);
-  }
-  
-  return lines.join('\n');
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map(item => {
+      const qty = `${formatQuantity(item.quantity).replace('.', ',')} ${formatUnit(item.unit, item.quantity)}`;
+      const price = item.pricePerUnit ? ` · ${formatPrice(item.pricePerUnit)}${PRICE_SUFFIX[item.unit]}` : '';
+      return `• ${itemDisplayName(item)}: ${qty}${price}`;
+    });
+
+  const parts = [header, lines.length ? lines.join('\n') : 'Nada na barraca esta semana.'];
+  const footer = [list.footerText?.trim(), list.contactInfo ? `Contato: ${list.contactInfo}` : '']
+    .filter(Boolean)
+    .join('\n');
+  if (footer) parts.push(footer);
+  return parts.join('\n\n');
 }
 
 /**

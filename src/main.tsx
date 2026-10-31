@@ -1,10 +1,14 @@
 import { createRoot } from "react-dom/client";
+import { registerSW } from "virtual:pwa-register";
 import App from "./App.tsx";
 import "./index.css";
 import "./i18n";
 import { seedDatabase } from "./data/db";
 
-// Seed database on app start
-seedDatabase().catch(console.error);
+// Offline: the service worker precaches the app shell and updates itself
+registerSW({ immediate: true });
 
-createRoot(document.getElementById("root")!).render(<App />);
+// First run seeds the demo farm before any screen reads it, so forms never start from an empty farm
+seedDatabase()
+  .catch(console.error)
+  .finally(() => createRoot(document.getElementById("root")!).render(<App />));

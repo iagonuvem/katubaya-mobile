@@ -1,0 +1,59 @@
+{
+  "rules": {
+    "title": "As regras do jogo",
+    "intro": "O app vira um jogo de sítio: o mapa é a casa, o ritual da semana é a missão e cada função é um lugar ou um movimento. Ninguém compete com ninguém; o único placar é o seu próprio sítio crescendo.",
+    "ritual": {
+      "title": "Ritual da semana",
+      "text": "A missão é o fluxo da semana. Cada passo acende sozinho quando a ação acontece.",
+      "observar": "Observar a mata", "observarHint": "sinais na colheita",
+      "colher": "Colher", "colherHint": "3 toques",
+      "paiol": "Arrumar o paiol", "paiolHint": "estoque + ajustes",
+      "feira": "Montar a feira", "feiraHint": "disponibilidade",
+      "mandar": "Mandar no zap", "mandarHint": "copiar mensagem",
+      "guardar": "Guardar o baú", "guardarHint": "exportar pacote"
+    },
+    "tree": {
+      "title": "A árvore do sítio",
+      "text": "Cada ritual fechado dá um galho. Semana pulada congela a árvore; nada murcha, nada é perdido.",
+      "semente": "Semente", "broto": "Broto", "muda": "Muda", "arvore": "Árvore",
+      "at_one": "{{count}} ritual", "at_other": "{{count}} rituais",
+      "yours_one": "Sua árvore: {{stage}}, com {{count}} ritual fechado. Ela aparece no terreno livre do mapa.",
+      "yours_other": "Sua árvore: {{stage}}, com {{count}} rituais fechados. Ela aparece no terreno livre do mapa."
+    },
+    "broto": {
+      "title": "Broto, o guia",
+      "text": "Fala o próximo passo, em uma frase, sem pressa e sem ponto de exclamação.",
+      "calm": "Tudo em dia. Aproveite a sombra.",
+      "mood": { "tranquilo": "Tudo em dia", "explicando": "Próximo passo", "comemorando": "Passo feito", "avisando": "Vencendo" },
+      "alt": { "tranquilo": "Broto tranquilo", "explicando": "Broto explicando", "comemorando": "Broto comemorando", "avisando": "Broto avisando" }
+    },
+    "fresh": {
+      "title": "Frescor no paiol",
+      "text": "A validade virou uma barra de vida em cada caixa, sempre com a palavra ao lado.",
+      "fresh": "Fresco · mais de 3 dias",
+      "soon": "Vencendo · 1 a 3 dias",
+      "out": "Vence hoje ou vencido",
+      "note": "Caixa vencida sai da feira e pede um ajuste: perda, consumo ou presente."
+    },
+    "seeds": {
+      "title": "Sementes guardadas",
+      "text": "Conquistas pessoais. Ficam no baú, nunca numa lista pública.",
+      "firstHarvest": "Primeira colheita",
+      "feirasSent_one": "{{count}} feira enviada", "feirasSent_other": "{{count}} feiras enviadas",
+      "collection_one": "Coleção com {{count}} carta", "collection_other": "Coleção com {{count}} cartas",
+      "firstBackup": "Primeiro baú guardado",
+      "guild_one": "{{count}} função na mata", "guild_other": "{{count}} funções na mata",
+      "zeroLoss": "Zero perda no mês",
+      "earned": " · conquistada",
+      "notYet": " · ainda não"
+    },
+    "never": {
+      "title": "O que o jogo nunca faz",
+      "ranking": "Ranking, placar público ou comparação entre sítios.",
+      "countdown": "Contagem regressiva, vida perdida ou sequência que zera.",
+      "account": "Pedir conta, internet ou mandar dados para fora sem você exportar.",
+      "truth": "Trocar a verdade do paiol por pontos: a quantidade é sempre a real.",
+      "hide": "Esconder função: tudo que existia no app continua a um toque."
+    }
+  }
+}

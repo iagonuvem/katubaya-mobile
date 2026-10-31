@@ -1,7 +1,7 @@
 /**
  * katubaya Domain Contracts
  * Source of truth for all data types
- * Schema Version: 1.1.0
+ * Schema Version: 1.2.0
  */
 
 // ============================================================================
@@ -16,6 +16,7 @@ export type CropCategoryType =
   | 'nuts'
   | 'roots'
   | 'animal'
+  | 'forage'
   | 'custom';
 
 export type UnitType = 
@@ -41,6 +42,22 @@ export type AdjustmentReason =
 export type ExpirationStatus = 'fresh' | 'expiring_soon' | 'expired';
 
 export type Species = 'cattle' | 'poultry' | 'swine' | 'goat' | 'sheep' | 'bees' | 'fish' | 'other';
+
+/** Stratum a plant occupies in the agroforest; 'pasto' for forage */
+export type Layer = 'emergente' | 'alto' | 'medio' | 'baixo' | 'rasteiro' | 'pasto';
+
+/** Animal products: collected daily (leite, ovos, mel) or obtained by slaughter (carne) */
+export type AnimalYield = 'collect' | 'slaughter';
+
+/** Kind of plot ("talhão") drawn on the farm map */
+export type ZoneType = 'canteiro' | 'linha' | 'agrofloresta' | 'pomar' | 'pasto' | 'abrigo';
+export type SunExposure = 'full' | 'partial' | 'shade';
+export type WaterSource = 'irrigated' | 'rain';
+
+/** Word used to count plants in a plot: "12 pés", "3 covas" */
+export type PlantCountUnit = 'pes' | 'covas' | 'mudas' | 'arvores' | 'touceiras';
+
+export type ObservationLevel3 = 0 | 1 | 2; // low / medium / high, meaning per field
 
 export type AnimalAdjustmentReason =
   | 'birth'
@@ -76,12 +93,18 @@ export interface Crop extends BaseEntity {
   categoryId: string;
   name: string;
   defaultUnit: UnitType;
-  shelfLifeDaysDefault: number;
+  shelfLifeDaysDefault: number; // 0 = not set yet ("falta validade")
   pricePerUnit?: number; // Price per unit in local currency
   guildTags?: string[];
   notes?: string;
   isFavorite: boolean;
   lastUsedAt?: string;
+  layer?: Layer; // default stratum when planted
+  cycleDays?: number; // days from planting to first harvest
+  isForage?: boolean; // offered when forming a pasture
+  species?: Species; // animal products: which animals produce it
+  animalYield?: AnimalYield;
+  derivedFromCropId?: string; // processed products: what it is made from (queijo ← leite)
 }
 
 export interface Cultivar extends BaseEntity {
@@ -95,10 +118,57 @@ export interface Cultivar extends BaseEntity {
 // ZONES (Optional)
 // ============================================================================
 
+/** A named area of the site. Plots ("talhões") are zones with a type; pastures and shelters host animal lots. */
 export interface Zone extends BaseEntity {
   name: string;
-  description?: string;
+  description?: string; // "agrofloresta em linha"
   sortOrder: number;
+  type?: ZoneType;
+  size?: string; // "24 × 6 m"
+  areaM2?: number;
+  gridRows?: number; // planting grid is 6 columns × gridRows
+  mapHeight?: number; // tile height on the farm map, in map px
+  sun?: SunExposure;
+  water?: WaterSource;
+}
+
+/** Plants occupying cells of a plot's grid (or counted without cells) */
+export interface Planting extends BaseEntity {
+  zoneId: string;
+  cropId: string;
+  cultivarId?: string;
+  layer: Layer;
+  cells: number[]; // indices in the 6 × gridRows grid
+  count?: number; // plants not drawn on the grid (e.g. 20 pés de mandioca)
+  countUnit: PlantCountUnit;
+  plantedAt: string;
+  endedAt?: string;
+  animalGroupId?: string; // pasture formed for this lot
+}
+
+/** A weekly look at a plot: phase, pollinators, pests, disease, soil */
+export interface Observation extends BaseEntity {
+  zoneId: string;
+  observedAt: string;
+  phase?: 'vegetative' | 'flowering' | 'fruiting' | 'dormant';
+  pollinators?: ObservationLevel3; // few / some / many
+  pest?: ObservationLevel3; // low / medium / high
+  disease?: ObservationLevel3; // none / suspect / yes
+  soil?: ObservationLevel3; // dry / ok / soaked
+  notes?: string;
+  photo?: string; // small JPEG data URL, taken on the phone
+  harvestEventId?: string; // signals noted while logging a harvest
+}
+
+/** A week whose six ritual steps were all done */
+export interface RitualWeek {
+  id: string; // ISO week key, "2026-W44"
+  completedAt: string;
+}
+
+export interface NotificationRead {
+  id: string; // deterministic notification id
+  readAt: string;
 }
 
 // ============================================================================
@@ -231,6 +301,7 @@ export interface AvailabilityList extends BaseEntity {
   generatedMessage?: string;
   isStale: boolean;
   inventorySnapshotAt: string;
+  sentAt?: string; // last copy to WhatsApp
 }
 
 export interface AvailabilityConfig {
@@ -278,4 +349,6 @@ export interface AppSettings {
   contactInfo: string;
   lastExportAt?: string;
   onboardingCompleted: boolean;
+  /** Notification categories the farmer turned off */
+  mutedNotifications?: string[];
 }

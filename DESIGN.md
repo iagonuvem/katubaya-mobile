@@ -1,346 +1,408 @@
-# katubaya design guidelines
+# katūbayá design guidelines
 
-How the katubaya interface is designed, and how to keep it that way. The rules here are
-grounded in Apple's Human Interface Guidelines (HIG), applied as design principles to a web
-PWA. Where a rule comes from the HIG, the page is cited as `page.md › Heading`; the pages are
+How the katūbayá interface is designed, and how to keep it that way. Since October 2026 the app
+is a **farm game**: the farm map is home, the weekly ritual is the mission, and every feature is
+a place on the map or a move. The visual source of truth is the design canvas
+**"Katūbayá mobile gamificado"** (claude.ai artifact `4JzTVUjXqjHjNRhZw1jucL`), built on the
+**Katūbayá** design system (artifact `YFD9pHx4QozAxX8NiV9tUZ`). This document turns that canvas
+into rules for the code.
+
+The rules are still grounded in Apple's Human Interface Guidelines (HIG), applied as principles to
+a web PWA. Where a rule comes from the HIG the page is cited as `page.md › Heading`; the pages are
 vendored under `.claude/skills/apple-design/references/hig/`.
 
-The interface language is pt-BR with an en locale. This document is in English, like the rest
-of `docs/`, so contributors can read it; UI copy examples stay in pt-BR.
+The interface language is pt-BR with an en locale. This document is in English, like the rest of
+`docs/`; UI copy examples stay in pt-BR.
 
 ## 1. Purpose and thesis
 
-katubaya has one job: a farmer standing in the field logs what was harvested in under 30
-seconds, and once a week turns that log into a sellable availability message for WhatsApp.
-Everything else (crops, lots, expiry, export) exists to serve those two moments.
+katūbayá has one job: a farmer standing in the field logs what the farm produced in a few taps,
+and once a week turns that log into a sellable WhatsApp message. The game exists to make that
+week feel like tending a place, never like filling forms.
 
-- **Thesis.** Fast, offline, one hand. The screen should get out of the way of a muddy thumb.
-- **Signature element.** The harvest quantity dial: a large number flanked by two round
-  buttons, with quick-add chips below. It is the one place the design is bold; everything
-  around it is quiet.
-- **Feeling.** Calm competence. Earthy, legible, no decoration that does not carry
-  information. Delight comes from speed and from seeing the week's harvest become a message,
-  not from ornament (`design-principles.md › Delight`).
+- **Thesis.** Fast, offline, one hand, and alive. The map shows the farm as it is today.
+- **Signature element.** The playable map (`/`): plots, pens, the storehouse (paiol), the market
+  stall (feira), the ritual board and the processing house, each a button. Little people on the
+  map act out what the farm needs right now: harvesting a ready plot, scouting an unobserved one,
+  watering a dry one, hoeing an empty bed, milking, collecting eggs, carrying a crate to the paiol.
+- **Second signature.** The weekly ritual: Observar → Colher → Paiol → Feira → Mandar → Guardar.
+  Each step lights up by itself when its action happens. A closed ritual grows the farm tree.
+- **Feeling.** Calm competence with a toy-like warmth: soil and paper, raised "game" buttons
+  that sink when pressed, sprites with soft 3D shading. Delight comes from the farm reacting to
+  real work, not from points.
 
 Apple's eight principles (`design-principles.md`) are the first filter for any screen:
 
 | Principle | What it means here |
 | --- | --- |
 | Purpose | Each screen has one job. If a control does not serve it, cut it. |
-| Agency | People can skip optional steps, undo mistakes, and never lose data silently. |
-| Responsibility | Data stays on the device. Claims in the UI are true (do not say "offline ready" until it is). |
+| Agency | People can skip optional steps, undo with an adjustment, and never lose data silently. |
+| Responsibility | Data stays on the device. Claims are true: "Funciona sem internet: Pronto" only shows once the service worker is active. |
 | Familiarity | Bottom navigation, sheets, back buttons and forms behave like the platform. |
-| Flexibility | Works at 375 px, at 200 % text size, in light and dark, with a keyboard or a screen reader. |
-| Simplicity | Progressive disclosure over density. Lists show a summary; details live one tap away. |
-| Craft | Spacing, alignment, wording and animation are finished. No placeholder controls. |
-| Delight | One signature moment per flow. Do not mistake delight for decoration. |
+| Flexibility | Works at 375 px, at 200 % text, light and dark, keyboard and screen reader. |
+| Simplicity | The map summarises; details live one tap away in a sheet or a screen. |
+| Craft | Spacing, alignment, wording and motion are finished. No placeholder controls. |
+| Delight | The farm reacts. Never a score, a streak or a countdown (§9). |
 
-## 2. Platform scope
+## 2. Platform scope and navigation
 
-katubaya is a React + Vite + Tailwind + shadcn/radix PWA. The HIG applies as principles and as
-foundations (accessibility, color, typography, layout, writing), not as native conventions
-(`cross-platform.md`). From the mobile conventions we deliberately adopt:
+React + Vite + Tailwind PWA, local-first on Dexie (IndexedDB), installable with a Workbox service
+worker (`vite-plugin-pwa`, app shell precached). The HIG applies as principles and foundations,
+not as native conventions (`cross-platform.md`).
 
-- Bottom navigation for top-level sections, a center button for the primary action
-  (`tab-bars.md › Best practices`: tabs navigate, the button acts).
-- Bottom sheets for short tasks and menus, with a grabber and swipe to dismiss
-  (`sheets.md › Best practices`).
-- Centered dialogs only for small forms; alerts only for destructive confirmation
-  (`modality.md`, `alerts.md`).
-- Safe areas, 44 pt targets, one-handed reach: primary actions sit mid-screen or lower
-  (`designing-for-ios.md › Best practices`, `layout.md › Guides and safe areas`).
-- Appearance follows the system by default. Settings offers an explicit override (Sistema /
-  Claro / Escuro); see §11 for why that is a deliberate deviation from
-  `dark-mode.md › Best practices`.
+- **Home is the map.** Every other screen is one or two taps from it and has a Back (‹) or Close
+  (×) button in the top-left. Flows that create something (Colher, Plantar, Processar, Observar,
+  Novo Lote, Ajustar Cabeças, Abrir talhão) use × and end on a "done" state with two buttons:
+  do another / go back to the farm.
+- **Bottom navigation:** Sítio | raised **+** | Mandar. The + opens the **mochila** (quick
+  actions bottom sheet). On the map, Mandar copies the current market list straight to the
+  clipboard; elsewhere it opens the Feira. Deliberate deviation (`tab-bars.md › Best practices`):
+  the bar holds one action button because logging production must be reachable from every screen.
+- **Sheets** (`sheets.md`): map sheets float above the bottom bar with a grabber; the mochila and
+  pickers are modal with a scrim. All sheets close by drag-down (80 px), Escape, or the × button,
+  and move focus inside.
+- **Width.** Phone layouts are designed at 390 px and centred at `max-w-[480px]`. The rules board
+  (`/regras`) is a page that grows to three columns on wide screens.
 
-Current layouts target the compact width class (phones). Tablet and desktop widths reuse the
-same layout centered at `max-w-lg`; a sidebar conversion is future work.
+### Screen inventory
+
+| Route | Artboard | Notes |
+| --- | --- | --- |
+| `/` | Sítio · mapa jogável | Map, HUD, sheets for plot, pen, paiol, feira, ritual, terreno, indústria |
+| (sheet) | Mochila · ações rápidas | Opened by the + button, from any screen |
+| `/colher` | Colher · wizard em 3 toques | `?talhao=`, `?produto=`; `?lote=` uses the animal-production step |
+| `/colher?lote=` | Registrar Produção · ordenha (passo 3) | Lot rows with a check, "Vira um lote no estoque" |
+| `/paiol` | Paiol · estoque e frescor | Crates by product, lots with life bars |
+| `/paiol/ajustar` | Ajustar paiol | `?lote=`; Somar only with Correção |
+| `/paiol/lote/:id` | Lote no estoque · de onde veio | Trace through processing and slaughter |
+| `/feira` | Feira da semana · disponibilidade | Toggle, nudge, WhatsApp preview, copy |
+| `/feira/banca` | Montar banca | Farm name, contact, header, footer |
+| `/produtos` | Coleção · culturas como cartas | Tabs Produtos / Lotes de Animais |
+| `/produtos/:id`, `/produtos/nova` | Carta · cultura e variedades | Edit turns the card into a form |
+| `/ajustes` | Ajustes · baú e backup | Chest, farm, notifications, appearance, about |
+| `/regras` | Sistema de jogo · regras | Live: ritual, tree, Broto, seeds |
+| `/talhao/:id` | Talhão · vista e camadas | Plot view, layers, weekly harvest chart, signs |
+| `/talhao/:id/plantar` | Plantar · roça, horta ou pasto | Cards in hand, tap holes |
+| `/talhao/novo` | Abrir talhão | 9 × 3 grid of 2 × 2 m squares |
+| `/observar` | Observar talhão · sinais da mata | Five signs, photo, note |
+| `/avisos` | Notificações | Generated on the phone |
+| `/animais` | Produtos · aba Lotes de Animais | Grouped by species |
+| `/animais/:id` | Lote de animais · produção e histórico | Daily chart, head history |
+| `/animais/novo`, `/:id/editar` | Novo Lote de animais | |
+| `/animais/:id/ajustar` | Ajustar Cabeças · com abate | `?motivo=slaughter`; meat becomes a lot |
+| `/processar` | Processar · leite em queijo | `?entrada=`; FIFO bars per lot |
 
 ## 3. Color
 
-Colors are semantic tokens defined once in `src/index.css` as HSL triplets and exposed through
-Tailwind (`tailwind.config.ts`). Components never use raw palette classes (`amber-500`,
-`green-600`), hex values or inline colors.
+Tokens live once in `src/index.css` as hex custom properties (light on `:root`, dark on `.dark`)
+and are exposed to Tailwind as `surface`, `surface-raised`, `ink`, `canopy`… (`tailwind.config.ts`).
+The shadcn HSL variables are kept only so the vendored primitives in `src/components/ui/` stay in
+the same palette; new UI uses the katūbayá tokens.
 
 ### Tokens
 
-| Token | Role | Light | Dark |
+| Token | Role | Light ("Daylight") | Dark ("Understory") |
 | --- | --- | --- | --- |
-| `background` | Page surface | `45 30% 97%` `#faf8f5` | `140 25% 10%` `#132017` |
-| `card` | Grouped content, header, nav | `45 25% 95%` `#f5f4ef` | `140 20% 14%` `#1d2b21` |
-| `foreground` | Primary text | `140 30% 15%` `#1b3222` | `45 30% 95%` `#f6f4ee` |
-| `muted-foreground` | Secondary text | `140 15% 37%` `#506d5a` | `45 15% 60%` `#a8a18a` |
-| `primary` | Brand green: primary actions, selected tab, favorites | `140 45% 31%` `#2b7343` | `80 50% 55%` `#9fc653` |
-| `secondary` | Quiet filled controls, neutral badges | `45 40% 88%` | `140 20% 20%` |
-| `muted` | Row backgrounds, skeletons | `45 20% 90%` | `140 15% 18%` |
-| `accent` | Hover surface for ghost/outline controls only | `80 40% 90%` | `80 20% 22%` |
-| `destructive` | Destructive actions and their confirmation | `0 70% 45%` `#c32222` | `0 65% 69%` `#e37d7d` (label `140 30% 10%`) |
-| `border` | Card and separator lines | `140 20% 85%` | `140 15% 22%` |
-| `input` | Form field borders, switch track | `140 12% 53%` | `140 12% 39%` |
-| `harvest-success` | Status: fresh | `140 60% 28%` `#1d7239` | `140 50% 50%` `#40bf6a` |
-| `harvest-warning` | Status: expiring soon, stale list | `40 90% 28%` `#885d07` | `40 80% 55%` `#e8ab30` |
-| `harvest-expired` | Status: expired | `0 70% 45%` `#c32222` | `0 65% 69%` `#e37d7d` |
-| `whatsapp` | The message preview bubble, nowhere else | `94 78% 87%` | `169 100% 18%` |
+| `surface` | Page ground: unbleached paper / humus | `#f0ede3` | `#151810` |
+| `surface-raised` | Cards, rows, inputs, sheets | `#faf8f2` | `#1e2317` |
+| `surface-sunken` | Segmented tracks, life-bar track, disabled | `#e5e1d3` | `#0e100a` |
+| `line` | Hairlines, the hard shadow of raised controls | `#cfc9b7` | `#353c2a` |
+| `line-strong` | Borders that mean something: secondary button, inputs, dashed empties | `#857c66` | `#717b5d` |
+| `ink` / `ink-muted` | Text / secondary text | `#1e2316` / `#5a5d4c` | `#ebe7d9` / `#a7a994` |
+| `canopy` | The brand green: primary button, selected chip, fresh, links | `#2d5a28` | `#8fcb6b` |
+| `canopy-soft` / `on-canopy` | Selected ground / label on canopy | `#d9e9cc` / `#ffffff` | `#223a1e` / `#121a0e` |
+| `canopy-edge` | Hard shadow under canopy buttons | `#1b3a17` | `#4d7a37` |
+| `river` (+ `-soft`) | Information, observing, milk, scouting | `#1d5d70` | `#80c6d8` |
+| `amber` (+ `-soft`) | Waiting, expiring soon, "next step", ready to harvest | `#7a5200` | `#e6b84b` |
+| `amber-bright` | Pulsing "ask" dots and amber life bars (not text) | `#d79a2b` | `#e6b84b` |
+| `urucum` (+ `-soft`) | Expires today / expired, errors, delete | `#a3321c` | `#f09076` |
 
-### Contrast (computed, WCAG ratio)
-
-Text up to 17 pt needs 4.5:1; 18 pt or bold needs 3:1 (`accessibility.md › Vision`). Every
-text token below clears 4.5:1 on `card`, and status text also clears it on its own 10 % tint
-(`bg-harvest-*/10` over `card`), which is where badges actually render.
+### Contrast (computed, WCAG)
 
 | Pair | Light | Dark |
 | --- | --- | --- |
-| `foreground` on `background` | 13.1:1 | 15.4:1 |
-| `muted-foreground` on `card` / on `muted/50` row | 5.2:1 / 5.0:1 | 5.7:1 / 5.4:1 |
-| `primary` text on `card` / on `primary/10` chip | 5.3:1 / 4.6:1 | 8.6:1 / n.a. |
-| `primary-foreground` on `primary` (button label) | 5.5:1 | 8.5:1 |
-| `destructive` text on `card` / label on `destructive` | 5.3:1 / 5.6:1 | 5.3:1 / 6.0:1 |
-| `harvest-success` text on its 10 % tint | 4.7:1 | 5.3:1 |
-| `harvest-warning` text on its 10 % tint | 4.6:1 | 6.0:1 |
-| `harvest-expired` text on its 10 % tint | 4.6:1 | 4.6:1 |
-| `input` border on `background` (non-text, 3:1 target) | 3.1:1 | 3.1:1 |
+| `ink` on `surface` | 13.7:1 | 14.5:1 |
+| `ink-muted` on `surface-raised` / `surface-sunken` | 6.4 / 5.2 | 6.7 / 8.0 |
+| `canopy` text on `surface-raised` / on `canopy-soft` | 7.6 / 6.3 | 8.4 / 6.5 |
+| `on-canopy` on `canopy` (primary label) | 8.1 | 9.3 |
+| `river` on `river-soft` | 5.7 | 7.2 |
+| `amber` on `amber-soft` / on `surface-raised` | 5.5 / 6.5 | 7.5 / 8.7 |
+| `urucum` on `urucum-soft` / on `surface-raised` | 5.3 / 6.5 | 6.3 / 6.8 |
+| `line-strong` on `surface` (non-text, 3:1) | 3.5 | 4.0 |
+| Map pin text `#1e2316` on pin `#faf8f2` | 15.1 | same (the scene is not themed) |
 
-Recompute whenever a token changes. A tiny script that does it lives in the review log at the
-end of this file.
+Recompute with the helper at the end of this file whenever a token changes.
+
+### Illustration palette
+
+The map, the plot view and product art are drawings, not UI. Their colors are fixed and do not
+follow the theme: map grass `#8fbf5a`, roads `#d2ad72`, fences `#e6d3a8` with posts `#a88a58`,
+soil `#b07a43` / beds `#8a5a2b`, pasture `#a8d06e`, coop yard `#d9b77a`, pig yard `#a07a4c`.
+Product art backgrounds and dots by category live in `src/components/game/crop.ts` (Frutas
+`#f3e5c0`/`#d79a2b`, Hortaliças `#d9e9cc`/`#2d5a28`, Ervas and Laticínios `#d1e6ec`/`#1d5d70`,
+Raízes and Carnes `#f5dcd3`/`#a3321c`…). Text drawn on art is always `#1e2316` (12:1+ on every
+pastel), never `ink`, so it stays dark in dark mode.
 
 ### Rules
 
-- **One color, one meaning** (`color.md › Best practices`). `harvest-warning` is only for
-  time-based status (expiring, stale). Favorites use `primary`. `destructive` is only for
-  delete and its confirmation. Never reuse the warning amber for emphasis.
-- **Status is never color alone** (`color.md › Inclusive color`). Every status chip carries
-  text ("Vence em 3 dias") or an icon.
-- **Brand color is spent sparingly** (`branding.md › Best practices`): the primary button of a
-  screen, the selected tab, the favorite star, the quantity in the dial. Not on card titles,
-  not on decoration.
-- **Tints** use the token with alpha: `bg-harvest-warning/10`, `border-primary/20`. Never a
-  lighter palette step.
-- Both appearances are first-class. Dark tokens are not inversions; `primary` shifts from deep
-  green to lime and `destructive` to a light red, both carrying a dark label, so filled buttons
-  and plain text both read on dark surfaces (`dark-mode.md › Dark Mode colors`).
-- **Never dim a container that holds text or controls** (`opacity-60` on a row drops its text
-  under 4.5:1). Show excluded or expired state with a muted background, a strikethrough and the
-  status badge; dim only decorative elements.
+- **One color, one meaning** (`color.md › Best practices`). Amber is waiting/expiring/next;
+  urucum is today, expired, error and delete; canopy is primary and fresh. Never amber for emphasis.
+- **Status is never color alone** (`color.md › Inclusive color`). Every life bar has its words
+  ("Vence em 3 dias"), every pin has a label, every pulsing dot sits next to text.
+- **At most one canopy fill per view** for the primary action (sheets may have one primary in the
+  action grid; it moves with the plot's state).
+- Never dim a container that holds controls below 4.5:1. The only dimmed rows are switched-off
+  market items, whose switch, name and buttons remain operable and labelled.
 
 ## 4. Typography
 
-The system font stack (`-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, …`) renders SF
-on Apple devices and the platform face elsewhere. One typeface, hierarchy by size and weight
-(`typography.md › Conveying hierarchy`).
+Two self-hosted faces (`@fontsource`, latin + latin-ext, offline): **Kanit** for everything,
+**IBM Plex Mono** for quantities, money, dates in stats and step counters. Hierarchy by size and
+weight (`typography.md › Conveying hierarchy`).
 
-| Role | Tailwind | Size | Weight | Use |
-| --- | --- | --- | --- | --- |
-| Screen title | `text-base font-semibold` | 16 px | 600 | `PageHeader` title |
-| Section title | `text-lg font-semibold` | 18 px | 600 | Card titles, sheet titles |
-| Display number | `text-4xl` / `text-5xl font-bold` | 36 / 48 px | 700 | Quantity dial, summary |
-| Stat | `text-3xl font-bold text-primary` | 30 px | 700 | Home counters |
-| Body | default | 16 px | 400 | Lists, descriptions, inputs |
-| Secondary | `text-sm text-muted-foreground` | 14 px | 400 | Meta lines under a name |
-| Caption / badge | `text-xs` (badges `font-semibold`) | 12 px | 400 / 600 | Status chips, hints |
+| Role | Class | Size / line | Weight |
+| --- | --- | --- | --- |
+| Screen title | `kb-title` | 28 / 34 | 500 |
+| Sub-screen title (flows, detail) | `kb-title-sm` | 26 / 32 | 500 |
+| Card title on a hero (Carta) | — | 30 / 36 | 500 |
+| Section | `kb-h2` / `kb-h3` | 20 / 26 · 18 / 24 | 500 |
+| Sheet title | — | 22 / 28 | 500 |
+| Body | default | 16 / 24 | 400 |
+| Secondary | `kb-sub` | 14 / 20 | 400 |
+| Hint | `kb-hint` | 13 / 18 | 400 |
+| Caption, chart labels | `text-xs` | 12 / 16 | 400–500 |
+| Display number (dial, stepper) | `kb-mono` | 40–48 | 500 |
 
-- Minimum size is 12 px (HIG minimum 11 pt). Never use `text-[10px]` or lighter than
-  `font-normal` for small text (`typography.md › Ensuring legibility`).
-- Sizes are rem-based so browser text scaling works. Containers that hold text use `min-h-*`,
-  not fixed `h-*`, so 200 % text does not clip (`typography.md › Supporting Dynamic Type`).
-- Do not block zoom: the viewport meta has no `user-scalable=no`.
-- Numbers that matter (quantity, price) are the largest thing on their screen; units sit next
-  to them in `muted-foreground`.
-- Money is formatted with `Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })`.
+- Minimum 11 px (chart values only); everything readable is ≥ 12 px.
+- Numbers that matter are the biggest thing on their card and are monospaced; units follow in the
+  same face or in `ink-muted`.
+- Money: `Intl.NumberFormat(lang, { style: 'currency', currency: 'BRL' })` (`fmtMoney`). The HUD
+  uses the compact form (no cents).
+- Do not block zoom; containers with text use `min-h-*`.
 
-## 5. Layout and spacing
+## 5. Layout, shape and depth
 
-- **Width.** Content is centered at `max-w-lg` (512 px) with `p-4` gutters. One column.
-- **Vertical rhythm.** `space-y-4` between cards, `space-y-2` between rows inside a card.
-  Card padding is `p-4`; compact info tiles may use `p-3`.
-- **Radius.** `--radius: 0.75rem`. Cards `rounded-lg`, chips and pills `rounded-full`,
-  bottom sheets `rounded-t-[10px]` (Drawer default).
-- **Bottom navigation.** Fixed, `h-16` (4 rem) plus the bottom safe area. Two tabs and the
-  center action button. Content above it pads `pb-[calc(5rem+var(--safe-area-bottom))]`.
-- **Safe areas** (`layout.md › Guides and safe areas`). `body` does not pad for them; bars pad
-  themselves: top bars `pt-[var(--safe-area-top)]`, fixed bottom bars
-  `pb-[var(--safe-area-bottom)]`. A fixed action bar above the nav sits at
-  `bottom-[calc(4rem+var(--safe-area-bottom))]`. With the iOS status bar style left at
-  `default`, the top inset is 0 in a standalone PWA and the padding is inert; it exists for a
-  future Capacitor shell, where it is not.
-- **The document scrolls**, not `<main>`. A scrolling `<main>` would detach the sticky header.
-- **Deliberate deviation.** The primary action button sits in the center of the bottom
-  navigation bar. `tab-bars.md` reserves tab bars for navigation; we accept the deviation because
-  "log a harvest" is the product's one job and must be reachable with the thumb from every
-  screen. It must stay the only action in that bar.
-- **Reach.** Primary actions live at the bottom (wizard footer, full-width Save) or in the
-  middle (dial). Headers hold only Back, a title and at most one secondary action.
-- **Stacking over squeezing.** When a row would wrap awkwardly at 375 px, stack the secondary
-  line under the primary one instead of fighting for horizontal space.
+- **Gutter** 16 px, vertical rhythm 12–16 px between blocks (`kb-screen` is a flex column with
+  `gap-4`). Screens with the bottom bar pad `112px + safe area`; flows pad 24 px.
+- **Radii.** Icon buttons 12, inputs 14, chips full, tap buttons 16, cards 18–22, hero cards 22–26,
+  sheets 24 (map) / 28 (modal), map tiles 6–10.
+- **Depth is a hard shadow, not blur.** Raised controls carry `0 3px 0 var(--line)` (secondary)
+  or `0 4px 0 var(--canopy-edge)` (primary); pressing translates them down and eats the shadow.
+  Floating things (sheets, toast, HUD) use soft shadows.
+- **Safe areas.** The HUD, headers and fixed bars pad themselves with `--safe-area-top/bottom`.
+- **Reach.** Primary actions sit at the bottom of flows (`mt-auto`), full width, 56 px tall.
+- **Stacking over squeezing.** Long names wrap; rows never truncate a quantity.
 
 ## 6. Components
 
-Use the shadcn components in `src/components/ui/` as the vocabulary. Customize with tokens,
-never by hard-coding colors inside a page.
+All in `src/components/game/` and `src/index.css` (`@layer components`).
 
 | Need | Use | Notes |
 | --- | --- | --- |
-| Screen chrome | `AppShell` + `PageHeader` | `showBack` for pushed screens; `showNav={false}` inside flows |
-| Primary action from anywhere | FAB in `AppShell` → `Drawer` menu | Grabber, swipe to dismiss, first action highlighted |
-| Short task, menu, details | `Drawer` (bottom sheet) | Max `85dvh`, inner scroll, safe-area padding at the bottom |
-| Small form (≤ 6 fields) | `Dialog` | Floats with 1 rem margins and rounded corners on phones |
-| Destructive confirmation | `AlertDialog` | Title as a question ("Excluir cultura?"), Cancel, destructive-styled action. Never `window.confirm` |
-| Lists of records | `Card` rows | Name, then one meta line, then status chips; chevron only when it opens something |
-| Status | `ExpirationBadge` / `Badge variant="outline"` with a status token | Text always present |
-| Filters | Chip buttons (`<button aria-pressed>` styled with `badgeVariants`) | Never a `div` with `onClick` |
-| One choice among 2 to 5 options | `ToggleGroup type="single"` (segmented) | Icon + label on every segment; selected segment filled with `primary` and semibold (`toggles.md › Best practices`: state never by color alone) |
-| Feedback | `sonner` toasts: `toast.success` / `toast.error` | One sentence; description says the next step ("Cole no WhatsApp para enviar") |
-| Loading | Skeleton cards or a spinner inside the content area | Never block the whole screen |
-| Empty | Icon, one line, one button for the next step | `writing.md › Provide clear next steps on any blank screens` |
+| Screen header | `ScreenHeader` | Back/close icon button, optional eyebrow, sub and one right action |
+| Primary / secondary / disabled / delete | `kb-tap kb-tap-go / -alt / -off / -danger` | `kb-tap-md` = 48 px; disabled keeps focus and uses `aria-disabled` |
+| Choice among a few | `kb-chip` (+ `kb-chip-on`), as `role="radio"` in a `radiogroup` | Filters use `kb-chip-ink` and `aria-pressed` |
+| Two to three views | `kb-segs` + `kb-seg` | Tabs use `role="tab"`; links use `aria-current` |
+| Picture choice (reason, type, species) | `kb-pick` | Icon + label, raised |
+| Quantities | `kb-stepper` around a `kb-mono` number; quick chips (−1, −5, Tudo) | 56 / 48 / 44 px |
+| On/off | `kb-switch` (`role="switch"`) | 52 × 32, excluded from the 44 px rule |
+| Status | `StatusPill` (tone + dot + words) | |
+| Freshness | `LifeBar` + `lifeLabel()` | Bar = share of shelf life left; 8 % on the last day |
+| Product art | `CropArt` | Crate sprite when drawn, else the initial on the category pastel |
+| Date of an event | `WhenRow` | "Agora · sáb, 31 out" + Mudar reveals a date field capped at now |
+| Saved | `DoneBanner` + summary card + two buttons | |
+| Feedback | `showToast()` + `GameToast` | Dark pill above the bottom bar, 2.6 s, `role="status"` |
+| Bottom sheet | `BottomSheet` (`variant="map" \| "modal"`) + `SheetHead` | Drag, Escape, focus |
+| Bottom bar | `BottomNav` | `active="sitio"` on the map, plots and lots |
 
-Component rules:
+Rules carried over: every icon-only control has `aria-label`; cards that open something are links
+or buttons, never `div` + `onClick`; destructive actions confirm in a modal sheet whose title is a
+question ("Excluir Banana?").
 
-- **Buttons.** `default` for the one primary action per screen, `outline` for secondary,
-  `ghost` for toolbar icons, `destructive` only inside an `AlertDialog` or an explicit delete.
-  Icon-only buttons use `size="icon"` and always carry `aria-label`. A global rule gives every
-  `button`/`a` a 44 × 44 minimum; do not shrink them with `h-8 w-8`.
-- **Inputs.** Every field has a `<Label htmlFor>`. Pick the keyboard: `inputMode="decimal"`
-  for quantities and prices, `"numeric"` for day counts, `type="tel"` for phones,
-  `type="search"` with `enterKeyHint="search"` for search (`entering-data.md`,
-  `virtual-keyboards.md`). Validate as people type and show the error next to the field.
-- **Select.** Radix `SelectItem` forbids an empty value. Use a sentinel (`'none'`) for "no
-  selection" and map it to `undefined`.
-- **Switch.** 28 × 48 (HIG minimum control size); it is excluded from the 44 px rule.
-- **Cards are not buttons.** A tappable row is a `<button>` styled like a card, or a card that
-  contains the button. Secondary actions inside a row stop propagation.
-- **No decorative affordances.** A drag handle that does not drag, a disabled icon with no
-  label, a "Ver todos" with no destination: delete them.
+## 7. The map and the game system
 
-## 7. Iconography
+### Layout (`src/components/map/layout.ts`)
 
-- `lucide-react` is the only icon set in UI chrome: `h-4 w-4` inline with text, `h-5 w-5` in
-  headers and nav, `h-6 w-6` in the dial buttons. Stroke weight matches the text weight next
-  to it (`icons.md`).
-- No emoji in chrome. Emoji is content: category icons chosen by the user, the WhatsApp
-  message itself, and the per-crop emoji previewed in the availability editor because it is
-  what the message will contain. Decorative emoji are `aria-hidden`.
-- Selected tab: `text-primary` plus a semibold label and `aria-current="page"`.
-- App icon: `public/icon-*.png` are rasterized from `favicon.svg`. They use an emoji on a
-  green disc, which is a placeholder, not a finished icon (`app-icons.md`: filled shapes,
-  no text or UI replicas). Replacing it is open work.
+The scene is a 390-px-wide stage scaled to the screen width. The top band is fixed: paiol
+(6, 96), ritual board (182, 186), market stall (242, 116). Plots stack from y = 284 in two
+masonry columns (x 14 w 158 / x 220 w 156, gap 14) with a road between them; a plot's height is
+`zone.mapHeight`, else by type (canteiro 100, linha 172, agrofloresta 206, pomar 160, pasto 150,
+abrigo 120), and new plots get `heightForArea()`. Below a road, animal pens and the processing
+house fill rows of two (188 / 142 wide, rows 178 then 138 tall). The free land closes the map and
+holds the farm tree. The seed farm reproduces the canvas exactly.
 
-## 8. Motion
+### What each tile shows (`Tiles.tsx`)
 
-- Motion is brief and purposeful: sheet slide-in, `active:scale-95` on chips, a spinning
-  refresh icon while loading. No motion on every tap, no bounces (`motion.md`).
-- `prefers-reduced-motion: reduce` collapses all animations and transitions globally
-  (`src/index.css`). State changes still happen; only the choreography is removed.
+Plots grow what is planted in their 6 × `gridRows` grid: canteiros draw beds with a sprite per
+planted hole, linhas draw rows (the tall row sways), agroflorestas scatter trees, shrubs and roots
+by stratum, pastures draw grass. Empty beds show ploughed lines. Pens draw up to six cows, eight
+hens, four pigs, five goats/sheep or hives, by head count.
 
-## 9. Writing and i18n
+### Plot states (`plotStatus` in `domain/rules/farm.ts`)
 
-Voice: a knowledgeable neighbor, direct and warm. Portuguese as spoken on a farm, not in a
-bank (`writing.md › Getting started`).
+| State | Rule (first that applies) | Pin | Who acts on the map |
+| --- | --- | --- | --- |
+| vazio / preparando | No plantings; preparando when observed in the last 14 days | Vazio (dashed dot) / Preparando solo | Farmer hoeing, dust |
+| pasto | Only forage, or a pasture zone | Pasto | — |
+| observar | Not observed for 14 days | Observar | Operator scouting |
+| seco | Last observation: dry soil | Solo seco | Operator with water drops |
+| pronto | A planting passed its cycle, or was harvested here in 14 days | Pronto p/ colher (pulsing) | Farmer harvesting, "+1" |
+| crescendo | Anything else | Crescendo | — |
 
-- **Every string goes through `t()`**, in both `pt-BR.json` and `en.json`, including
-  `aria-label`, placeholders and toast text. The two files must have the same keys (the test
-  suite is the place to assert that).
-- **Capitalization.** Title Case for screen titles and button labels ("Registrar Colheita",
-  "Gerar Lista"); sentence case for body, helper text, empty states and toasts' descriptions.
-  Apply per element type, consistently (`writing.md › Best practices`).
-- **Buttons say what happens**, with a verb: "Copiar para WhatsApp", not "OK". The name
-  survives the flow: "Gerar Lista" produces "Lista gerada".
-- **Errors say what to do next**: "Não foi possível salvar a cultura. Tente novamente." Never
-  "Oops", never "we".
-- **Empty states invite the next action** and include the button for it.
-- **Numbers and dates** follow the active locale through `Intl` (`i18n.language`): comma
-  decimals and `R$ 6,50/kg` in pt-BR. Date formats are still hard-coded `dd/MM` in a few places;
-  route them through one helper when a language selector exists.
-- **Plurals** use i18next suffixes and `count`: `t('inventory.expiresIn', { count: days })`
-  with `expiresIn_one` / `expiresIn_other` in both locales. Never "1 dias".
-- Interpolate, do not concatenate.
-- **Vocabulary:** "Produto" for anything the farm sells (plant or animal), "Produção" for the
-  event that creates stock (colheita, ordenha, coleta, abate), "Lote" for a product batch,
-  "Lote de animais" for a herd group.
-- **Claims must be true.** "Pronto para uso offline" was replaced by "Seus dados ficam neste
-  aparelho" until a service worker exists (`design-principles.md › Responsibility`).
+The primary button in the plot sheet follows the state (Colher, Observar, Plantar or Abrir).
+Pens pulse when the daily product (a species' `animalYield: 'collect'` product produced on 2+ of
+the last 7 days) has not been logged today. The processing house pulses while there is stock of
+a product that something is made from. The porter walks while the market list is out of date; a
+customer waits at the stall once it is sent.
 
-## 10. Accessibility floor
+### Weekly ritual (`ritual`)
 
-Every change ships with all of these true (`accessibility.md`):
+| Step | Lights up when, this ISO week |
+| --- | --- |
+| Observar | An observation was saved (also from signs noted while harvesting) |
+| Colher | Any production was logged |
+| Paiol | A stock adjustment was made, or production happened and nothing is expired |
+| Feira | A list was generated this week and stock has not changed since |
+| Mandar | The list was copied to WhatsApp |
+| Guardar | A chest (export) was saved |
 
-- Text contrast ≥ 4.5:1 (≥ 3:1 for 18 px+ or bold) in light and dark; recompute when a token
-  changes.
-- Controls ≥ 44 × 44 (switches ≥ 28 × 48), with spacing between adjacent controls.
-- Every icon-only control has an `aria-label`; toggles expose `aria-pressed`; the selected
-  tab exposes `aria-current`.
-- Keyboard: everything reachable by Tab, one visible focus ring (global `:focus-visible`).
-- Nothing conveyed by color alone; progress (wizard steps) also exists as text.
-- Pinch zoom and browser text scaling work; layouts stack instead of clipping.
-- Reduce Motion respected.
-- Form fields labelled; the right virtual keyboard; errors adjacent and announced
-  (`aria-live="polite"`).
+A complete week is recorded once in `ritualWeeks`; the farm tree grows with them: Semente 0,
+Broto 1, Muda 4, Árvore 12. A skipped week freezes the tree; nothing withers.
 
-## 11. Dark mode
+### Notifications (`notifications`)
 
-Appearance follows the system through `next-themes` (`attribute="class"`,
-`defaultTheme="system"`). Settings › Aparência offers an explicit override as a three-way
-segmented choice: Sistema (default), Claro, Escuro. This is a **deliberate deviation**:
-`dark-mode.md › Best practices` says to avoid an app-specific appearance setting, and
-`settings.md › Best practices` says to avoid redundant versions of systemwide settings. The
-product owner asked for the override; the design limits the damage by keeping Sistema as the
-default, labelling the choice as applying to this app only, and never adding a second place
-to change it. Both palettes are defined in `src/index.css`; test every screen in both. Whites are softened
-(`#f6f4ee`, never pure white), overlays are `bg-black/80`, and the WhatsApp bubble has its own
-dark value so the preview still reads like WhatsApp.
+Generated on the phone from the data, grouped Hoje / Esta semana, ids deterministic so read state
+sticks (`notificationReads`): lots expiring today or expired (urucum, Ajustar), one reminder per
+product expiring in 1–3 days (Processar when it can become something else), plots ready, dry,
+unobserved, empty for 3+ weeks or close to harvest, the market list out of date or missing, daily
+animal production not logged, and the chest older than 6 days. Categories can be muted in Ajustes.
 
-## 12. Review checklist for a PR
+### Broto and saved seeds
 
-1. Which of the eight principles does the change serve? If none, why ship it?
-2. New colors: are they tokens? Did you recompute contrast? One color, one meaning?
-3. New controls: 44 pt, `aria-label`, keyboard focus, real `<button>`?
-4. New strings: in both locales, correct case, verb on the button, next step in the error?
-5. New layout: safe areas, 375 px, 200 % text, light and dark?
-6. One thing to remove: is there an accessory that can go?
+Broto, the guide, speaks the top notification as one calm sentence, without exclamation marks, in
+one of four moods (tranquilo, explicando, comemorando, avisando). Saved seeds are personal
+achievements shown on `/regras`: first harvest, 4 markets sent, 10 cards, first chest, 5 roles in
+the forest, zero loss in the month.
 
-## 13. Review log
+### What the game never does
 
-**2026-10-17, full-codebase review (HIG lenses 1–5).** Rating before: Critical issues.
-Fixed: status text contrast (warning 1.9:1 → 4.5:1, success 3.1:1 → 4.6:1, dark expired
-3.8:1 → 4.6:1), accent hover surface (2.5:1 label → 11.8:1), input border visibility, pinch
-zoom re-enabled, safe areas on header, nav, wizard and action bars, 44 pt rule no longer
-distorting switches, global focus ring and Reduce Motion, aria-labels on all icon-only
-controls, chips and cards turned into real buttons, `window.confirm` → `AlertDialog`,
-Radix `SelectItem value=""` crash, invalid category tint CSS, emoji removed from chrome,
-amber palette replaced by status/primary tokens, WhatsApp bubble tokenized, hardcoded strings
-moved to i18n, duplicate availability config UI removed, dead controls removed, inventory row
-overflow stacked, harvest date timezone bug, Home availability card wired to real data,
-Settings farm form wired, PWA icons and theme colors.
+Rankings or comparing farms; countdowns, lost lives or streaks that reset; asking for an account or
+sending data out unless the farmer exports; trading the storehouse's truth for points; hiding a
+feature. Any new mechanic must pass this list.
 
-A second adversarial pass then caught and fixed: the sticky header defeated by a scrolling
-`<main>`, the FAB rendering as an oval, the quick-actions drawer missing its close button and
-initial focus, two competing stores for farm name and contact (Settings is now the only one),
-plural forms ("1 dias"), status and destructive text that still missed 4.5:1 on their own
-tints, rows dimmed with `opacity` over live controls, invalid HTML inside buttons and
-headings, a drawer that vanished mid-animation, a future harvest date accepted by the wizard,
-and the duplicate-harvest flow losing its unit. Rating after: Good. Verified in the browser at
-375 px in both appearances.
+## 8. Iconography and art
 
-**2026-10-17, appearance override.** Added Settings › Aparência (Sistema / Claro / Escuro) at
-the owner's request, documented as a deliberate deviation in §11.
+- **Icons:** the stroke set in `src/components/game/Icon.tsx` (24 × 24, 1.75 stroke, round caps),
+  drawn for the canvas. It is the only icon set in new screens. Decorative icons are
+  `aria-hidden`; meaningful ones get `label`.
+- **Sprites:** `src/assets/game/*.webp` (2× display size): agricultora, operadora, carregador,
+  cliente, paiol, indústria, galinheiro, crates (banana, cacau, mandioca) and Broto's four moods;
+  `logo.svg` and `grafismo.svg` (the band on the rules board). Look them up with `sprite()` /
+  `cropSprite()`. Scene plants and animals are SVG symbols in `SceneDefs.tsx`.
+- No emoji in chrome. The WhatsApp message itself carries none either.
 
-**2026-10-30, livestock expansion.** The farm now has animals: an `animal` category type,
-animal lots ("lote de animais") with a headcount and an adjustment log, a "lote de animais"
-origin field in the harvest wizard for animal products, processing that turns stock into
-another product FIFO, a `dozen` unit, and zones editable in Settings. The same components
-carry it (Dialog forms, AlertDialog deletes, Select with a sentinel, lucide species icons),
-so no new tokens or patterns were introduced.
+## 9. Motion
 
-Open: a designed app icon; a service worker before claiming offline readiness; a language
-selector in Settings (dates still use pt-BR patterns until then); tablet/desktop sidebar
-layout; the primary action button inside the navigation bar is a deliberate deviation kept
-on purpose (see §5).
+All motion is defined in `src/index.css` and `src/components/map/map.css`:
 
-Contrast helper (Node): paste the HSL triplets and run.
+| Name | Duration / easing | Use |
+| --- | --- | --- |
+| `kb-up` | 240 ms `cubic-bezier(.2,.8,.2,1)` | Sheets rising |
+| `kb-rise` / `kb-step-in` | 220–240 ms ease-out | New cards, wizard steps, tab panels |
+| `kb-toast` | 260 ms ease-out | Toast |
+| `kb-pop` | 520 ms spring-like | Done states, confetti |
+| `kb-drop` | 700 ms | The harvest crate falling into place |
+| `kb-fresh` | 400 ms | Market list just regenerated |
+| `kb-sprout` | 260 ms | A seedling appearing in a hole |
+| `kb-pulse` (`kb-ask`, `map-ask`) | 1.6 s loop | "Needs you" dots, next ritual step |
+| Map loops | 0.4–12 s | sway, harvest, hoe, dust, scout, drops, graze, peck, roam, wig, walk, gain, steam |
+| Press | 90 ms | Raised buttons sink 2–4 px |
+
+`prefers-reduced-motion: reduce` stops every loop and hides the decorative particles ("+1",
+dust, drops, gains); state changes still happen.
+
+## 10. Writing and i18n
+
+Voice: a knowledgeable neighbour, direct and warm; Portuguese as spoken on a farm.
+
+- **Every string goes through `t()`.** Strings live per screen in
+  `src/i18n/locales/<lang>/<screen>.json`, merged at startup. Tests assert that both languages
+  have the same keys, that every literal key used in code exists, and that plural keys are always
+  called with `count`.
+- **Plurals** with `_one` / `_other` (and `_zero` where it reads better).
+- **Buttons say what happens** ("Guardar no paiol", "Copiar para o WhatsApp", "Registrar
+  Processamento"); Title Case on buttons and screen titles, sentence case elsewhere.
+- **Vocabulary (fixed):** Produto, Produção, Lote, Lote de animais, Cabeças, Zona ou pasto,
+  Processamento, Abate, Ajuste; game words: Sítio, Paiol, Feira, Banca, Carta, Coleção, Talhão,
+  Cova, Ritual, Baú.
+- **The WhatsApp message stays in pt-BR** whatever the UI locale: it is content for customers.
+- Numbers and dates follow the active language via `src/lib/format.ts`.
+
+## 11. Accessibility floor
+
+- Contrast per §3 in both themes; recompute on any token change.
+- Controls ≥ 44 × 44 (switch 52 × 32); the map's hit areas cover whole tiles.
+- Every map element is a real `<button>` with a spoken label ("Talhão Linha da banana, Pronto p/
+  colher") and `aria-expanded`; the scene drawing is `aria-hidden`.
+- Radio groups, tabs, switches and toggles expose their state (`aria-checked`, `aria-selected`,
+  `aria-pressed`); progress bars expose values; charts have a text `aria-label` with the numbers.
+- Sheets move focus inside, close with Escape and return focus.
+- Nothing by color alone; Reduce Motion respected; zoom and text scaling work.
+
+## 12. Dark mode
+
+Follows the system by default (`next-themes`, class strategy); Ajustes › Aparência overrides with
+Claro / Escuro / Sistema for this app only — a deliberate deviation from `dark-mode.md › Best
+practices`, kept because the owner asked for it. Dark ("Understory") tokens are not inversions:
+canopy turns light green with a dark label, urucum turns coral. The map scene and product art keep
+their daylight colors in both themes; UI chrome around them (HUD, sheets, bars) follows the theme.
+
+## 13. Data the screens rely on
+
+Schema 1.2.0 (Dexie v3) adds: `Zone.type/size/gridRows/mapHeight/sun/water` (plots),
+`Planting` (cells of a plot's grid, stratum, count unit), `Observation` (phase, pollinators,
+pests, disease, soil, note, photo), `RitualWeek`, `NotificationRead`, `Crop.layer/cycleDays/
+isForage/species/animalYield/derivedFromCropId`, `AvailabilityList.sentAt`,
+`AppSettings.mutedNotifications`. All game state is derived by pure functions in
+`src/domain/rules/farm.ts` (tested in `farm.test.ts`); screens read one live snapshot
+(`useFarm`) and write through `src/data/actions.ts`.
+
+## 14. Review checklist for a PR
+
+1. Which artboard or rule does the change follow? If none, which principle does it serve?
+2. New colors are tokens (or illustration colors in the documented files)? Contrast recomputed?
+3. New controls: real elements, 44 px, labels, state exposed, keyboard reachable?
+4. New strings in both locales, plural keys with `count`, verb on the button?
+5. 375 px, 200 % text, light and dark, Reduce Motion?
+6. Does the map still tell the truth about the farm? Does the change pass §7 "never does"?
+
+## 15. Review log
+
+**2026-10-17, full-codebase review (HIG lenses 1–5).** Status contrast, safe areas, focus ring,
+Reduce Motion, 44 pt targets, real buttons, AlertDialog for deletes, i18n of all strings. Rating
+after: Good.
+
+**2026-10-30, livestock expansion.** Animal lots, processing FIFO, the `dozen` unit.
+
+**2026-10-31, the farm game.** The whole interface was rebuilt from the "Katūbayá mobile
+gamificado" canvas: new design system (Kanit + IBM Plex Mono, soil/canopy/river/amber/urucum
+tokens with a dark "Understory" theme), the playable map as home with sheets for every place,
+the weekly ritual and farm tree, Broto, saved seeds, notifications generated on the phone, plots
+with plantings and observations, and 22 phone screens plus the rules page. The PWA service worker
+is now registered, so "Funciona sem internet" is true once it activates. Verified in Chromium at
+390 px in light and dark and at 1440 px for the rules page, with an end-to-end run of the main
+flows (market update and send, milking, processing, slaughter with meat, planting, observing,
+opening a plot, new animal lot, stock adjustment, new card, notifications, language switch).
+
+Open: a designed app icon (the PWA icons are still placeholders); a tablet layout for the phone
+screens; per-lot picking in processing (FIFO is automatic); photos are stored downscaled inside
+observations and travel in the full-history export as data URLs.
+
+Contrast helper (Node): paste hex pairs and run.
 
 ```js
-const hsl=(h,s,l)=>{s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return[f(0),f(8),f(4)]};
-const lum=([r,g,b])=>{const c=x=>x<=0.03928?x/12.92:((x+0.055)/1.055)**2.4;return .2126*c(r)+.7152*c(g)+.0722*c(b)};
-const ratio=(a,b)=>{const[x,y]=[lum(a),lum(b)].sort((p,q)=>q-p);return((x+.05)/(y+.05)).toFixed(2)};
-const blend=(fg,a,bg)=>fg.map((c,i)=>c*a+bg[i]*(1-a)); // a 10 % tint over a surface
-const card=hsl(45,25,95), warning=hsl(40,90,28);
-console.log(ratio(warning, card), ratio(warning, blend(warning,.10,card))); // 5.29, 4.63
+const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255);
+const lum=c=>{const f=x=>x<=0.03928?x/12.92:((x+0.055)/1.055)**2.4;const[r,g,b]=c.map(f);return .2126*r+.7152*g+.0722*b};
+const ratio=(a,b)=>{const[x,y]=[lum(hex(a)),lum(hex(b))].sort((p,q)=>q-p);return((x+.05)/(y+.05)).toFixed(1)};
+console.log(ratio('#7a5200','#f3e5c0')); // amber on amber-soft: 5.5
 ```

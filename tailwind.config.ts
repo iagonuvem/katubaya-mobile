@@ -47,14 +47,18 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // WhatsApp message bubble (preview only)
-        whatsapp: "hsl(var(--whatsapp))",
-        // Harvest status colors
-        harvest: {
-          success: "hsl(var(--harvest-success))",
-          warning: "hsl(var(--harvest-warning))",
-          expired: "hsl(var(--harvest-expired))",
-        },
+        // katūbayá tokens (DESIGN.md §3)
+        surface: { DEFAULT: "var(--surface)", raised: "var(--surface-raised)", sunken: "var(--surface-sunken)" },
+        line: { DEFAULT: "var(--line)", strong: "var(--line-strong)" },
+        ink: { DEFAULT: "var(--ink)", muted: "var(--ink-muted)" },
+        canopy: { DEFAULT: "var(--canopy)", soft: "var(--canopy-soft)", on: "var(--on-canopy)" },
+        river: { DEFAULT: "var(--river)", soft: "var(--river-soft)" },
+        amber: { DEFAULT: "var(--amber)", soft: "var(--amber-soft)", bright: "var(--amber-bright)" },
+        urucum: { DEFAULT: "var(--urucum)", soft: "var(--urucum-soft)", on: "var(--on-urucum)" },
+      },
+      fontFamily: {
+        sans: ["Kanit", "Avenir Next", "Segoe UI", "system-ui", "sans-serif"],
+        mono: ["IBM Plex Mono", "ui-monospace", "SF Mono", "Menlo", "monospace"],
       },
       borderRadius: {
         lg: "var(--radius)",

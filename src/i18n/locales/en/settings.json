@@ -1,0 +1,43 @@
+{
+  "settings": {
+    "title": "Settings",
+    "chest": "Farm chest",
+    "chestNever": "No chest saved yet.",
+    "chestLast_one": "Last chest saved {{count}} day ago.",
+    "chestLast_other": "Last chest saved {{count}} days ago.",
+    "chestRitual": "Saving now closes step 6 of the ritual.",
+    "packFeira": "Market pack",
+    "packFeiraHint": "Current list · JSON + CSV in a ZIP",
+    "packFull": "Full history",
+    "packFullHint_one": "{{crops}} products · {{count}} production · every adjustment",
+    "packFullHint_other": "{{crops}} products · {{count}} productions · every adjustment",
+    "chestNote": "The files follow katūbayá's data contract, in JSON and CSV. Take everything, whenever you want.",
+    "saved": "Chest saved: {{file}}",
+    "exportError": "Could not pack the chest. Try again.",
+    "farm": "Your farm",
+    "zones_one": "Plots on the map: {{count}} · see on the map",
+    "zones_other": "Plots on the map: {{count}} · see on the map",
+    "notices": "Notifications",
+    "noticeToggle": "Notify about {{name}}",
+    "noticeHint": {
+      "paiol": "Lots expiring or expired",
+      "talhao": "Harvest ready, observe, plant",
+      "animal": "Milking, eggs and milk to process",
+      "feira": "Out-of-date list",
+      "bau": "Reminder to save the chest"
+    },
+    "look": "Appearance",
+    "theme": "Theme",
+    "themes": { "light": "Light", "dark": "Dark", "system": "System" },
+    "language": "Language",
+    "themeHint": "Applies to this app only. System follows the phone.",
+    "about": "About",
+    "version": "Version",
+    "offline": "Works without internet",
+    "offlineReady": "Ready",
+    "offlinePending": "On the next visit",
+    "account": "Account",
+    "noAccount": "None. The data stays here.",
+    "rules": "How the game works"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "common": {
+    "close": "Fechar",
+    "back": "Voltar",
+    "change": "Mudar",
+    "optional": "(opcional)",
+    "notes": "Observações",
+    "notesPlaceholder": "Notas sobre a produção...",
+    "now": "Agora",
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "noZone": "Sem zona",
+    "noPrice": "Sem preço",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "loading": "Carregando o sítio…",
+    "error": "Não foi possível salvar. Tente novamente.",
+    "days_one": "{{count}} dia",
+    "days_other": "{{count}} dias",
+    "heads_one": "{{count}} cabeça",
+    "heads_other": "{{count}} cabeças"
+  },
+  "nav": {
+    "label": "Navegação",
+    "farm": "Sítio",
+    "send": "Mandar",
+    "actions": "Ações rápidas"
+  },
+  "mochila": {
+    "title": "O que vamos fazer?",
+    "produce": "Registrar Produção",
+    "produceHint": "Colheita, ordenha, ovos ou abate",
+    "adjust": "Ajustar paiol",
+    "adjustHint": "Vendeu, deu, comeu ou perdeu",
+    "animals": "Lotes de Animais",
+    "animalsHint": "Cabeças, nascimentos, vendas e abates",
+    "process": "Processar",
+    "processHint": "Leite em queijo, carne em linguiça",
+    "product": "Adicionar Produto",
+    "productHint": "Da roça ou de origem animal",
+    "stall": "Montar a banca",
+    "stallHint": "Cabeçalho, rodapé e horários da feira",
+    "zone": "Nova zona no mapa",
+    "zoneHint": "Talhão, canteiro ou pasto"
+  },
+  "units": {
+    "kg_one": "kg", "kg_other": "kg",
+    "g_one": "g", "g_other": "g",
+    "unit_one": "unid", "unit_other": "unid",
+    "bunch_one": "maço", "bunch_other": "maços",
+    "liter_one": "L", "liter_other": "L",
+    "ml_one": "ml", "ml_other": "ml",
+    "box_one": "cx", "box_other": "cx",
+    "bag_one": "saco", "bag_other": "sacos",
+    "dozen_one": "dz", "dozen_other": "dz"
+  },
+  "species": {
+    "cattle": "Bovinos", "poultry": "Aves", "swine": "Suínos", "goat": "Caprinos",
+    "sheep": "Ovinos", "bees": "Abelhas", "fish": "Peixes", "other": "Outros"
+  },
+  "layers": {
+    "emergente": "Emergente", "alto": "Alto", "medio": "Médio", "baixo": "Baixo", "rasteiro": "Rasteiro", "pasto": "Pasto"
+  },
+  "plantUnits": {
+    "pes_one": "{{count}} pé", "pes_other": "{{count}} pés",
+    "covas_one": "{{count}} cova", "covas_other": "{{count}} covas",
+    "mudas_one": "{{count}} muda", "mudas_other": "{{count}} mudas",
+    "arvores_one": "{{count}} árvore", "arvores_other": "{{count}} árvores",
+    "touceiras_one": "{{count}} touceira", "touceiras_other": "{{count}} touceiras"
+  },
+  "zoneTypes": {
+    "canteiro": "Canteiro", "linha": "Linha", "agrofloresta": "Agrofloresta", "pomar": "Pomar", "pasto": "Pasto", "abrigo": "Abrigo"
+  },
+  "adjustReasons": {
+    "sold": "Vendido", "consumed": "Consumido", "gift": "Presente", "damage": "Dano", "loss": "Perda", "correction": "Correção", "processing": "Processar"
+  },
+  "animalReasons": {
+    "birth": "Nascimento", "purchase": "Compra", "death": "Morte", "sale": "Venda", "slaughter": "Abate", "correction": "Correção"
+  },
+  "life": {
+    "fresh": "Fresco · {{days}}",
+    "soon_one": "Vence amanhã",
+    "soon_other": "Vence em {{count}} dias",
+    "today": "Vence hoje",
+    "expired_one": "Vencido há {{count}} dia",
+    "expired_other": "Vencido há {{count}} dias"
+  }
+}

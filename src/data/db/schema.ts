@@ -16,7 +16,11 @@ import type {
   AvailabilityConfig,
   AppSettings,
   AnimalGroup,
-  AnimalAdjustment
+  AnimalAdjustment,
+  Planting,
+  Observation,
+  RitualWeek,
+  NotificationRead
 } from '@/domain/contracts/types';
 
 export class FarmerCoreDB extends Dexie {
@@ -33,6 +37,10 @@ export class FarmerCoreDB extends Dexie {
   appSettings!: Table<AppSettings, string>;
   animalGroups!: Table<AnimalGroup, string>;
   animalAdjustments!: Table<AnimalAdjustment, string>;
+  plantings!: Table<Planting, string>;
+  observations!: Table<Observation, string>;
+  ritualWeeks!: Table<RitualWeek, string>;
+  notificationReads!: Table<NotificationRead, string>;
 
   constructor() {
     super('FarmerCoreDB');
@@ -57,6 +65,15 @@ export class FarmerCoreDB extends Dexie {
       inventoryAdjustments: 'id, lotId, cropId, adjustedAt, reason, harvestEventId',
       animalGroups: 'id, name, species, zoneId',
       animalAdjustments: 'id, groupId, adjustedAt, reason, harvestEventId'
+    });
+
+    // v3: the farm map. Zones become plots with plantings and weekly observations; the ritual keeps its history.
+    this.version(3).stores({
+      zones: 'id, sortOrder, type',
+      plantings: 'id, zoneId, cropId, plantedAt',
+      observations: 'id, zoneId, observedAt',
+      ritualWeeks: 'id',
+      notificationReads: 'id'
     });
   }
 }

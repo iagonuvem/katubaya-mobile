@@ -1,307 +1,134 @@
-/**
- * Settings Page
- */
+/** Ajustes: the farm's chest (backup), the farm itself, notifications, appearance and about */
 
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { Smartphone, Loader2, Package, Archive, Monitor, Sun, Moon, MapPin, Trash2 } from 'lucide-react';
-import { useTheme } from 'next-themes';
-import { toast } from 'sonner';
-import { AppShell } from '@/components/layout/AppShell';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { APP_VERSION, SCHEMA_VERSION } from '@/domain/contracts';
-import type { Zone } from '@/domain/contracts/types';
-import { db } from '@/data/db/schema';
+import { useFarm, useNow } from '@/hooks/useFarm';
+import { calendarDays, plotZones, type NoticeCategory } from '@/domain/rules/farm';
+import { APP_VERSION } from '@/domain/contracts';
 import { settingsRepository } from '@/data/repositories';
-import { useExport } from '@/hooks/useExport';
+import { exportPack } from '@/data/actions';
+import { GameToast, ScreenHeader } from '@/components/game/Shell';
+import { Icon } from '@/components/game/Icon';
+import { Loading } from '@/components/game/bits';
+import { showToast } from '@/components/game/toast';
+
+const CATEGORIES: NoticeCategory[] = ['paiol', 'talhao', 'animal', 'feira', 'bau'];
 
 export default function SettingsPage() {
-  const { t } = useTranslation();
-  const { exportData, isExporting } = useExport();
-  const { theme, setTheme } = useTheme();
-  const settings = useLiveQuery(() => settingsRepository.get(), []);
-  const zones = useLiveQuery(() => db.zones.orderBy('sortOrder').toArray(), [], []);
-
-  const [farmName, setFarmName] = useState('');
-  const [contactInfo, setContactInfo] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [zoneName, setZoneName] = useState('');
-  const [deletingZone, setDeletingZone] = useState<Zone | null>(null);
+  const { t, i18n } = useTranslation();
+  const data = useFarm();
+  const now = useNow();
+  const [farm, setFarm] = useState<{ name: string; contact: string } | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
-    if (settings) {
-      setFarmName(settings.farmName ?? '');
-      setContactInfo(settings.contactInfo ?? '');
-    }
-  }, [settings]);
+    if (data && !farm) setFarm({ name: data.settings.farmName, contact: data.settings.contactInfo });
+  }, [data, farm]);
+  useEffect(() => {
+    navigator.serviceWorker?.getRegistration().then(r => setOffline(!!r?.active)).catch(() => setOffline(false));
+  }, []);
+  if (!data || !farm) return <Loading />;
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSaving(true);
+  const s = data.settings;
+  const since = s.lastExportAt ? calendarDays(s.lastExportAt, now) : undefined;
+  const muted = new Set(s.mutedNotifications ?? []);
+  const pack = async (type: 'availability' | 'full') => {
+    setBusy(type);
     try {
-      await settingsRepository.update({ farmName: farmName.trim(), contactInfo: contactInfo.trim() });
-      toast.success(t('settings.saved'));
+      const r = await exportPack(type);
+      showToast(t('settings.saved', { file: r.filename }));
     } catch {
-      toast.error(t('errors.saveFailed'));
+      showToast(t('settings.exportError'));
     } finally {
-      setIsSaving(false);
+      setBusy(null);
     }
   };
-
-  const handleAddZone = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const name = zoneName.trim();
-    if (!name) return;
-    const now = new Date().toISOString();
-    try {
-      await db.zones.add({ id: crypto.randomUUID(), name, sortOrder: (zones.at(-1)?.sortOrder ?? -1) + 1, createdAt: now, updatedAt: now });
-      setZoneName('');
-      toast.success(t('settings.zoneAdded'));
-    } catch {
-      toast.error(t('errors.saveFailed'));
-    }
+  const saveFarm = () => settingsRepository.update({ farmName: farm.name.trim(), contactInfo: farm.contact.trim() });
+  const toggleNotice = (c: NoticeCategory) => {
+    const next = new Set(muted);
+    if (next.has(c)) next.delete(c); else next.add(c);
+    settingsRepository.update({ mutedNotifications: [...next] });
+  };
+  const setLang = (lng: 'pt-BR' | 'en') => {
+    i18n.changeLanguage(lng);
+    settingsRepository.setLocale(lng);
   };
 
-  const handleDeleteZone = async () => {
-    if (!deletingZone) return;
-    try {
-      await db.zones.delete(deletingZone.id);
-    } catch {
-      toast.error(t('errors.saveFailed'));
-    } finally {
-      setDeletingZone(null);
-    }
-  };
-
-  const handleExportAvailability = () => {
-    exportData('availability');
-  };
-
-  const handleExportFull = () => {
-    exportData('full');
-  };
+  const group = 'flex flex-col gap-3 rounded-[20px] border border-line bg-surface-raised p-4';
+  const packBtn = 'flex min-h-[72px] items-center gap-3 rounded-2xl border-[1.5px] border-line bg-surface px-3.5 py-3 text-left text-ink transition-transform active:translate-y-0.5';
 
   return (
-    <AppShell>
-      <PageHeader title={t('settings.title')} showBack />
+    <main className="kb-screen kb-screen-flow !gap-3.5">
+      <ScreenHeader title={t('settings.title')} back={{ to: '/', label: t('paiol.backToFarm') }} />
 
-      <div className="p-4 max-w-lg mx-auto space-y-6">
-        {/* Farm Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t('settings.farmInfo')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSave} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="farmName">{t('settings.farmName')}</Label>
-                <Input
-                  id="farmName"
-                  value={farmName}
-                  onChange={(e) => setFarmName(e.target.value)}
-                  placeholder={t('settings.farmNamePlaceholder')}
-                  autoComplete="organization"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contact">{t('settings.contact')}</Label>
-                <Input
-                  id="contact"
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  value={contactInfo}
-                  onChange={(e) => setContactInfo(e.target.value)}
-                  placeholder={t('settings.contactPlaceholder')}
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={isSaving || !settings}>
-                {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />}
-                {t('actions.save')}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+      <section className={group} aria-labelledby="bau-t" style={{ background: 'var(--river-soft)', borderColor: 'transparent' }}>
+        <div className="flex flex-col">
+          <h2 id="bau-t" className="kb-h3">{t('settings.chest')}</h2>
+          <span className="text-sm leading-5">{since === undefined ? t('settings.chestNever') : t('settings.chestLast', { count: since })} {t('settings.chestRitual')}</span>
+        </div>
+        <button type="button" className={packBtn} style={{ boxShadow: '0 3px 0 var(--line)' }} onClick={() => pack('availability')} disabled={!!busy} aria-busy={busy === 'availability'}>
+          <span className="flex h-12 w-12 flex-none items-center justify-center rounded-[14px] bg-canopy text-canopy-on"><Icon name="download" /></span>
+          <span className="flex flex-1 flex-col"><span className="font-medium">{t('settings.packFeira')}</span><span className="text-[13px] leading-[18px] text-ink-muted">{t('settings.packFeiraHint')}</span></span>
+        </button>
+        <button type="button" className={packBtn} style={{ boxShadow: '0 3px 0 var(--line)' }} onClick={() => pack('full')} disabled={!!busy} aria-busy={busy === 'full'}>
+          <span className="flex h-12 w-12 flex-none items-center justify-center rounded-[14px] border-[1.5px] border-line-strong bg-surface-raised text-ink"><Icon name="chest" /></span>
+          <span className="flex flex-1 flex-col">
+            <span className="font-medium">{t('settings.packFull')}</span>
+            <span className="text-[13px] leading-[18px] text-ink-muted">{t('settings.packFullHint', { crops: data.crops.length, count: data.harvests.length })}</span>
+          </span>
+        </button>
+        <span className="kb-hint">{t('settings.chestNote')}</span>
+      </section>
 
-        {/* Appearance: an explicit override of the system appearance, "system" by default */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t('settings.appearance')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Label id="theme-label">{t('settings.theme')}</Label>
-            <ToggleGroup
-              type="single"
-              variant="outline"
-              value={theme ?? 'system'}
-              onValueChange={(value) => value && setTheme(value)}
-              aria-labelledby="theme-label"
-              className="grid grid-cols-3 gap-2"
-            >
-              {([
-                ['system', Monitor],
-                ['light', Sun],
-                ['dark', Moon],
-              ] as const).map(([value, Icon]) => (
-                <ToggleGroupItem
-                  key={value}
-                  value={value}
-                  className="gap-2 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:font-semibold"
-                >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                  {t(`settings.themes.${value}`)}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-            <p className="text-xs text-muted-foreground">{t('settings.themeHint')}</p>
-          </CardContent>
-        </Card>
+      <section className={group} aria-labelledby="sitio-t">
+        <h2 id="sitio-t" className="kb-h3">{t('settings.farm')}</h2>
+        <label className="flex flex-col gap-1 text-sm text-ink-muted">{t('stall.farmName')}
+          <input className="kb-field !min-h-12 !rounded-xl !bg-surface" type="text" value={farm.name} onChange={e => setFarm({ ...farm, name: e.target.value })} onBlur={saveFarm} /></label>
+        <label className="flex flex-col gap-1 text-sm text-ink-muted">{t('stall.contact')}
+          <input className="kb-field !min-h-12 !rounded-xl !bg-surface" type="tel" placeholder="(XX) XXXXX-XXXX" value={farm.contact} onChange={e => setFarm({ ...farm, contact: e.target.value })} onBlur={saveFarm} /></label>
+        <Link to="/" className="kb-inline text-[15px]">{t('settings.zones', { count: plotZones(data).length })}</Link>
+      </section>
 
-        {/* Zones: shared by harvests and animal lots */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t('settings.zones')}</CardTitle>
-            <CardDescription>{t('settings.zonesHint')}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {zones.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t('settings.zonesEmpty')}</p>
-            ) : (
-              <ul className="space-y-2">
-                {zones.map((zone) => (
-                  <li key={zone.id} className="flex items-center gap-3 rounded-md bg-muted/50 pl-3 pr-1 min-h-11">
-                    <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                    <span className="flex-1 truncate">{zone.name}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label={t('settings.deleteZoneNamed', { name: zone.name })}
-                      onClick={() => setDeletingZone(zone)}
-                    >
-                      <Trash2 className="h-4 w-4" aria-hidden="true" />
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <form onSubmit={handleAddZone} className="flex gap-2">
-              <Label htmlFor="zoneName" className="sr-only">{t('settings.zoneName')}</Label>
-              <Input
-                id="zoneName"
-                value={zoneName}
-                onChange={(e) => setZoneName(e.target.value)}
-                placeholder={t('settings.zoneNamePlaceholder')}
-                aria-label={t('settings.zoneName')}
-                enterKeyHint="done"
-              />
-              <Button type="submit" variant="outline" disabled={!zoneName.trim()}>
-                {t('actions.addZone')}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+      <section className={group} aria-labelledby="avisos-t">
+        <h2 id="avisos-t" className="kb-h3">{t('settings.notices')}</h2>
+        {CATEGORIES.map(c => (
+          <div key={c} className="flex items-center justify-between gap-3">
+            <span className="flex flex-col"><span>{t(`notices.filter.${c}`)}</span><span className="kb-hint">{t(`settings.noticeHint.${c}`)}</span></span>
+            <button type="button" role="switch" aria-checked={!muted.has(c)} aria-label={t('settings.noticeToggle', { name: t(`notices.filter.${c}`) })} className="kb-switch" onClick={() => toggleNotice(c)}><span /></button>
+          </div>
+        ))}
+      </section>
 
-        {/* Data Management */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t('settings.dataManagement')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full justify-start gap-3 h-auto py-3 whitespace-normal"
-              onClick={handleExportAvailability}
-              disabled={isExporting}
-            >
-              {isExporting ? (
-                <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden="true" />
-              ) : (
-                <Package className="h-4 w-4 shrink-0" aria-hidden="true" />
-              )}
-              <div className="text-left">
-                <p className="font-medium">{t('export.availabilityPack')}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t('settings.exportDescription')}
-                </p>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full justify-start gap-3 h-auto py-3 whitespace-normal"
-              onClick={handleExportFull}
-              disabled={isExporting}
-            >
-              {isExporting ? (
-                <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden="true" />
-              ) : (
-                <Archive className="h-4 w-4 shrink-0" aria-hidden="true" />
-              )}
-              <div className="text-left">
-                <p className="font-medium">{t('export.fullHistory')}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t('settings.exportDescription')}
-                </p>
-              </div>
-            </Button>
-          </CardContent>
-        </Card>
+      <section className={group} aria-labelledby="look-t">
+        <h2 id="look-t" className="kb-h3">{t('settings.look')}</h2>
+        <div className="kb-segs !rounded-[14px]" role="radiogroup" aria-label={t('settings.theme')}>
+          {(['light', 'dark', 'system'] as const).map(v => (
+            <button key={v} type="button" role="radio" aria-checked={s.theme === v} className={`kb-seg !rounded-[10px] ${s.theme === v ? 'kb-seg-on' : ''}`} onClick={() => settingsRepository.setTheme(v)}>{t(`settings.themes.${v}`)}</button>
+          ))}
+        </div>
+        <div className="kb-segs !rounded-[14px]" role="radiogroup" aria-label={t('settings.language')}>
+          {(['pt-BR', 'en'] as const).map(v => (
+            <button key={v} type="button" role="radio" aria-checked={i18n.language === v} className={`kb-seg !rounded-[10px] ${i18n.language === v ? 'kb-seg-on' : ''}`} onClick={() => setLang(v)} lang={v}>{v === 'en' ? 'English' : 'Português'}</button>
+          ))}
+        </div>
+        <span className="kb-hint">{t('settings.themeHint')}</span>
+      </section>
 
-        {/* About */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t('settings.about')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center justify-between py-2">
-              <span className="text-muted-foreground">{t('settings.version')}</span>
-              <Badge variant="secondary">{APP_VERSION}</Badge>
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between py-2">
-              <span className="text-muted-foreground">{t('settings.schema')}</span>
-              <Badge variant="outline">{SCHEMA_VERSION}</Badge>
-            </div>
-            <Separator />
-            <div className="flex items-center gap-2 py-2 text-muted-foreground">
-              <Smartphone className="h-4 w-4" aria-hidden="true" />
-              <span className="text-sm">{t('settings.localData')}</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <AlertDialog open={!!deletingZone} onOpenChange={(open) => !open && setDeletingZone(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('settings.deleteZone')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('settings.deleteZoneDesc')}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('actions.cancel')}</AlertDialogCancel>
-            <AlertDialogAction className={buttonVariants({ variant: 'destructive' })} onClick={handleDeleteZone}>
-              {t('actions.delete')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </AppShell>
+      <section className={group} aria-labelledby="about-t">
+        <h2 id="about-t" className="kb-h3">{t('settings.about')}</h2>
+        <div className="flex items-center justify-between gap-2 text-[15px]"><span className="text-ink-muted">{t('settings.version')}</span><span className="kb-mono">{APP_VERSION}</span></div>
+        <div className="flex items-center justify-between gap-2 text-[15px]">
+          <span className="text-ink-muted">{t('settings.offline')}</span>
+          <span className="rounded px-2 py-px text-[13px] font-medium" style={offline ? { background: 'var(--canopy-soft)', color: 'var(--canopy)' } : { background: 'var(--amber-soft)', color: 'var(--amber)' }}>
+            {offline ? t('settings.offlineReady') : t('settings.offlinePending')}
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-2 text-[15px]"><span className="text-ink-muted">{t('settings.account')}</span><span className="text-right">{t('settings.noAccount')}</span></div>
+        <Link to="/regras" className="kb-inline text-[15px]">{t('settings.rules')}</Link>
+      </section>
+      <GameToast bottom={24} />
+    </main>
   );
 }

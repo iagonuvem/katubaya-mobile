@@ -1,0 +1,43 @@
+{
+  "feira": {
+    "title": "Feira",
+    "stall": "Banca",
+    "period": "Período",
+    "window": { "this": "Esta semana", "next": "Próxima semana" },
+    "none": "Ainda não há lista. Monte a feira com o que está no paiol.",
+    "staleHarvests_one": "{{count}} colheita entrou depois da última lista. Atualize para a feira bater com o paiol.",
+    "staleHarvests_other": "{{count}} colheitas entraram depois da última lista. Atualize para a feira bater com o paiol.",
+    "stale_one": "{{count}} mudança no paiol depois da última lista. Atualize para a feira bater com o paiol.",
+    "stale_other": "{{count}} mudanças no paiol depois da última lista. Atualize para a feira bater com o paiol.",
+    "update": "Atualizar a feira",
+    "build": "Montar a feira",
+    "fresh": "Feira em dia.",
+    "freshMeta_one": "Gerada {{when}}. {{count}} item na lista.",
+    "freshMeta_other": "Gerada {{when}}. {{count}} itens na lista.",
+    "tapHint": "Toque para tirar ou pôr",
+    "inStock": "Fresco · {{qty}} no paiol",
+    "include": "Incluir {{name}}",
+    "less": "Menos {{name}}",
+    "more": "Mais {{name}}",
+    "preview": "Como chega no WhatsApp",
+    "copy": "Copiar para o WhatsApp",
+    "copied": "Copiado. Ritual: Mandar feito."
+  },
+  "stall": {
+    "title": "Montar a banca",
+    "back": "Voltar à feira",
+    "hero": "O jeito da sua banca aparece em toda lista.",
+    "farm": "Informações do sítio",
+    "farmName": "Nome do sítio",
+    "contact": "Contato",
+    "message": "Sua mensagem",
+    "header": "Cabeçalho",
+    "headerPlaceholder": "Feira desta semana",
+    "headerHint": "Deixe em branco para usar o padrão.",
+    "footer": "Rodapé",
+    "footerHint": "Horários de entrega, formas de pagamento.",
+    "after": "Depois de salvar, atualize a feira para ver a mudança.",
+    "save": "Salvar banca",
+    "saved": "Banca salva."
+  }
+}

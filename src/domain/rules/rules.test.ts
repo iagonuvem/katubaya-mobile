@@ -45,25 +45,33 @@ describe('getCropEmoji', () => {
 });
 
 describe('generateAvailabilityMessage', () => {
-  it('lists only included items, sorted, with price per unit', () => {
+  it('lists only included items, sorted, with quantity and price per unit', () => {
     const message = generateAvailabilityMessage({
       id: 'list', createdAt: '', updatedAt: '', isStale: false, inventorySnapshotAt: '',
-      farmName: 'Sítio Verde', contactInfo: '(11) 99999-0000', footerText: 'Entregas no sábado',
+      farmName: 'Sítio Pé de Serra', footerText: 'Retirada sáb, 7h às 11h',
       items: [
-        { id: 'b', cropId: 'c2', cropName: 'Tomate', quantity: 5, unit: 'kg', pricePerUnit: 8, isIncluded: true, sortOrder: 1 },
-        { id: 'a', cropId: 'c1', cropName: 'Banana', quantity: 3, unit: 'kg', pricePerUnit: 6.5, isIncluded: true, sortOrder: 0 },
-        { id: 'x', cropId: 'c3', cropName: 'Alface', quantity: 2, unit: 'unit', isIncluded: false, sortOrder: 2 },
+        { id: 'b', cropId: 'c2', cropName: 'Alface', quantity: 5, unit: 'unit', pricePerUnit: 3, isIncluded: true, sortOrder: 1 },
+        { id: 'a', cropId: 'c1', cropName: 'Banana', cultivarName: 'Prata', quantity: 16, unit: 'kg', pricePerUnit: 6.5, isIncluded: true, sortOrder: 0 },
+        { id: 'c', cropId: 'c4', cropName: 'Ovos Caipiras', quantity: 6, unit: 'dozen', isIncluded: true, sortOrder: 2 },
+        { id: 'x', cropId: 'c3', cropName: 'Coentro', quantity: 3, unit: 'bunch', isIncluded: false, sortOrder: 3 },
       ],
     });
 
     expect(message).toBe([
-      '🌿 Produtos Disponíveis - Sítio Verde',
-      '━━━━━━━━━━━━━━━━━━━━━',
-      '🍌 Banana - R$ 6,50/kg',
-      '🍅 Tomate - R$ 8,00/kg',
-      '━━━━━━━━━━━━━━━━━━━━━',
-      'Entregas no sábado',
-      '📞 Contato: (11) 99999-0000',
+      '*Sítio Pé de Serra* · Feira desta semana',
+      '',
+      '• Banana Prata: 16 kg · R$ 6,50/kg',
+      '• Alface: 5 unid · R$ 3,00 a unid',
+      '• Ovos Caipiras: 6 dz',
+      '',
+      'Retirada sáb, 7h às 11h',
     ].join('\n'));
+  });
+
+  it('names the next week and says when the stall is empty', () => {
+    const message = generateAvailabilityMessage({
+      id: 'list', createdAt: '', updatedAt: '', isStale: false, inventorySnapshotAt: '', windowId: 'next', items: [],
+    });
+    expect(message).toBe('Feira da próxima semana\n\nNada na barraca esta semana.');
   });
 });

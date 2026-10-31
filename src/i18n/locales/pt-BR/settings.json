@@ -1,0 +1,43 @@
+{
+  "settings": {
+    "title": "Ajustes",
+    "chest": "Baú do sítio",
+    "chestNever": "Nenhum baú guardado ainda.",
+    "chestLast_one": "Último baú guardado há {{count}} dia.",
+    "chestLast_other": "Último baú guardado há {{count}} dias.",
+    "chestRitual": "Guardar agora fecha o passo 6 do ritual.",
+    "packFeira": "Pacote da feira",
+    "packFeiraHint": "Lista atual · JSON + CSV em ZIP",
+    "packFull": "Histórico completo",
+    "packFullHint_one": "{{crops}} produtos · {{count}} produção · todos os ajustes",
+    "packFullHint_other": "{{crops}} produtos · {{count}} produções · todos os ajustes",
+    "chestNote": "Os arquivos seguem o contrato de dados do katūbayá, em JSON e CSV. Você leva tudo, quando quiser.",
+    "saved": "Baú guardado: {{file}}",
+    "exportError": "Não foi possível montar o baú. Tente de novo.",
+    "farm": "Seu sítio",
+    "zones_one": "Talhões no mapa: {{count}} · ver no mapa",
+    "zones_other": "Talhões no mapa: {{count}} · ver no mapa",
+    "notices": "Avisos",
+    "noticeToggle": "Avisar sobre {{name}}",
+    "noticeHint": {
+      "paiol": "Lotes vencendo ou vencidos",
+      "talhao": "Colheita pronta, observar, plantar",
+      "animal": "Ordenha, ovos e leite para processar",
+      "feira": "Lista desatualizada",
+      "bau": "Lembrete de guardar o baú"
+    },
+    "look": "Aparência",
+    "theme": "Tema",
+    "themes": { "light": "Claro", "dark": "Escuro", "system": "Sistema" },
+    "language": "Idioma",
+    "themeHint": "Vale só para este app. Sistema segue o celular.",
+    "about": "Sobre",
+    "version": "Versão",
+    "offline": "Funciona sem internet",
+    "offlineReady": "Pronto",
+    "offlinePending": "Na próxima visita",
+    "account": "Conta",
+    "noAccount": "Nenhuma. Os dados ficam aqui.",
+    "rules": "Como o jogo funciona"
+  }
+}

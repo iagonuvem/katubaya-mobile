@@ -1,20 +1,14 @@
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { sprite } from '@/components/game/Shell';
 
-const NotFound = () => {
+export default function NotFound() {
   const { t } = useTranslation();
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-muted-foreground">{t('notFound.title')}</p>
-        <Link to="/" className="text-primary underline hover:text-primary/90">
-          {t('notFound.backHome')}
-        </Link>
-      </div>
-    </div>
+    <main className="kb-screen kb-screen-flow items-center justify-center text-center">
+      <img src={sprite('broto-avisando')} alt="" className="h-32 w-auto" />
+      <h1 className="kb-title">{t('notFound.title')}</h1>
+      <Link to="/" className="kb-tap kb-tap-go max-w-xs">{t('notFound.backHome')}</Link>
+    </main>
   );
-};
-
-export default NotFound;
+}
