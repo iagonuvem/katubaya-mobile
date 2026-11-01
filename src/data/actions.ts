@@ -26,8 +26,10 @@ import type {
   Observation,
   PlantCountUnit,
   Planting,
+  SyncPack,
   Zone,
 } from '@/domain/contracts/types';
+import { APP_VERSION, SCHEMA_VERSION } from '@/domain/contracts';
 import { newId } from '@/lib/id';
 
 const stamp = () => {
@@ -219,6 +221,25 @@ export async function exportPack(type: ExportType) {
   downloadBlob(result.blob, result.filename);
   await settingsRepository.update({ lastExportAt: new Date().toISOString() });
   return result;
+}
+
+/**
+ * Sends the whole local database to the farmer's own server (see server/). The phone stays the
+ * source of truth: the server only keeps dated copies, and nothing is sent without this call.
+ */
+export async function syncToServer(serverUrl: string): Promise<{ records: number }> {
+  const settings = await settingsRepository.get();
+  const deviceId = settings.deviceId ?? newId();
+  const tables = Object.fromEntries(await Promise.all(db.tables.map(async t => [t.name, await t.toArray()] as const)));
+  const pack: SyncPack = {
+    manifest: { schemaVersion: SCHEMA_VERSION, appVersion: APP_VERSION, exportedAt: new Date().toISOString(), packId: newId(), packType: 'full_history', deviceId, farmName: settings.farmName },
+    tables,
+  };
+  const base = /^https?:\/\//.test(serverUrl) ? serverUrl : `http://${serverUrl}`;
+  const res = await fetch(new URL('/api/sync', base), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(pack) });
+  if (!res.ok) throw new Error(`sync failed: ${res.status}`);
+  await settingsRepository.update({ deviceId, lastSyncAt: pack.manifest.exportedAt });
+  return { records: Object.values(tables).reduce((n, rows) => n + rows.length, 0) };
 }
 
 export async function markNoticesRead(ids: string[]): Promise<void> {

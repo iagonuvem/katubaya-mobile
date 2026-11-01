@@ -315,5 +315,9 @@ export const AppSettingsSchema = z.object({
   farmName: z.string().max(100),
   contactInfo: z.string().max(200),
   lastExportAt: z.string().datetime().optional(),
-  onboardingCompleted: z.boolean()
+  onboardingCompleted: z.boolean(),
+  mutedNotifications: z.array(z.string()).optional(),
+  deviceId: z.string().uuid().optional(),
+  syncServerUrl: z.string().optional(),
+  lastSyncAt: z.string().datetime().optional()
 });

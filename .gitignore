@@ -134,6 +134,9 @@ dist
 !.yarn/sdks
 !.yarn/versions
 
+# Copies received by the farmer's own sync server
+server/data/
+
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*

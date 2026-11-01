@@ -39,7 +39,7 @@ The rule is simple:
 
 ## MVP outcome (the weekly ritual)
 
-Observe → Log harvest → Update inventory → Generate availability → Share on WhatsApp → Export/backup.
+Observe → Log harvest → Update inventory → Generate availability → Share on WhatsApp → Export/backup (or sync to your own server).
 
 ## MVP modules
 
@@ -76,6 +76,56 @@ Observe → Log harvest → Update inventory → Generate availability → Share
 
 * Crop catalog: category, cultivar/breed, typical units, shelf-life defaults, notes
 * Optional tags for guild/function and seasonality
+
+7. Sync to your own server
+
+* One tap sends the whole local database to a server the farmer controls
+* The server keeps dated, inspectable JSON copies and never writes back
+* Optional: the app is complete without it
+
+## Offline-first architecture
+
+katubaya is one app with one source of truth: the database on the farmer's device.
+
+### Where the data lives
+
+* **IndexedDB on the device** (`FarmerCoreDB`, through Dexie) holds every table: crops, lots, harvests, adjustments, animal lots, plots, observations, availability lists, settings. Every screen reads it and every action writes to it. No request is needed to read or write anything.
+* **The app shell is precached** by a service worker, so once the app has been opened it loads with no network at all. Browsers only install service workers over https or `localhost`, so over plain http on the LAN the phone still needs the server to load the app; its data is local either way. For true offline on phones, serve over https or use the native build.
+* **No account, no identity.** The only id the app creates for itself is a random `deviceId`, generated on the first sync so a server can tell two phones apart.
+
+### Two ways to run it
+
+| How | Where the app comes from | Server address in Settings |
+| --- | --- | --- |
+| **PWA on the local network** | The farmer's own machine serves the built app (`npm run serve`), or the dev server does (`npm run dev`). Phones open `http://<that machine>:<port>` and install it from the browser | Leave empty: the app talks to the origin it was loaded from |
+| **Native build (Ionic / Capacitor)** | Installed as an app, so the page has no web origin to talk to | Required: the machine's address, e.g. `192.168.0.10:8787` |
+
+### Sync: a copy on your own server, only when you tap
+
+Settings → **Sincronizar** → **Enviar para o servidor**.
+
+1. The app reads every local table and wraps it as a `SyncPack`: the same manifest the chest export carries (schema version, app version, timestamp, pack id, device id, farm name) plus `tables`, one array per table, exactly as stored.
+2. It `POST`s the pack as JSON to `/api/sync` on the configured server.
+3. The server writes it to `server/data/<deviceId>/<exportedAt>.json` and answers with how many records it kept. Files are never merged or overwritten, so a phone that was reset cannot erase an earlier copy.
+
+What this deliberately is **not**:
+
+* **Not automatic.** Nothing leaves the device unless the farmer taps the button. No background sync, no polling, no telemetry.
+* **Not a source of truth.** The server never writes back. If the phone and the server disagree, the phone is right, so there is no conflict to resolve.
+* **Not a cloud.** The server is one Node script with no dependencies that the farmer, or someone they trust, runs on a laptop, a Raspberry Pi or a rented machine. The copies are plain JSON in a folder, readable with any text editor, in the same data contract as the exported chest.
+
+Restoring from a copy is not built in yet. Because the file is the full contract-defined dump, a restore, or a merge of two phones, is a Bridge another builder can write without changing the app.
+
+### Running the server
+
+```bash
+npm run build   # once: produces dist/
+npm run serve   # serves dist/ and receives syncs on http://<your LAN IP>:8787
+```
+
+`PORT` changes the port and `KATUBAYA_DATA_DIR` changes where copies are kept (default `server/data/`, git-ignored). The script prints the addresses to type into the phone. During development `npm run dev` mounts the same receiver on port 8080, so a phone on the Wi-Fi can sync to the dev machine without typing anything.
+
+The receiver accepts any device on the network. That is the right default for a farm's Wi-Fi and the wrong one for the open internet: if you expose it beyond the LAN, put it behind your own VPN or a reverse proxy with authentication. The handler is one function in `server/sync.mjs` if you prefer to add a shared token.
 
 ## The cooperation lens (minimal but powerful)
 

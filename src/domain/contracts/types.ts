@@ -328,6 +328,12 @@ export interface ExportManifest {
   farmName?: string;
 }
 
+/** What Sync sends: the same manifest as the chest, plus every local table as stored */
+export interface SyncPack {
+  manifest: ExportManifest;
+  tables: Record<string, unknown[]>;
+}
+
 export interface AvailabilityPack {
   manifest: ExportManifest;
   availabilityList: AvailabilityList;
@@ -351,4 +357,9 @@ export interface AppSettings {
   onboardingCompleted: boolean;
   /** Notification categories the farmer turned off */
   mutedNotifications?: string[];
+  /** Generated on the first sync; names this phone's folder on the farmer's server */
+  deviceId?: string;
+  /** Empty on the PWA (same origin). Required on a native build */
+  syncServerUrl?: string;
+  lastSyncAt?: string;
 }

@@ -28,6 +28,7 @@ export const ICONS = {
   cards: 'M5 6h8a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM8 3h11a2 2 0 0 1 2 2v13',
   process: 'M4 4h6v6H4zM14 14h6v6h-6zM10 7h4a3 3 0 0 1 3 3v4',
   download: 'M12 3v12M7 10l5 5 5-5M4 19h16',
+  upload: 'M12 15V3M7 8l5-5 5 5M4 19h16',
   chest: 'M5 8h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2zM3 12h18M10 12v3h4v-3M5 8l2-4h10l2 4',
   milk: 'M8 2h8v4l2 3v13H6V9l2-3zM6 13h12',
   egg: 'M12 3c-4 0-7 6-7 11a7 7 0 0 0 14 0c0-5-3-11-7-11z',

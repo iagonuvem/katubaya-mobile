@@ -3,28 +3,31 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Capacitor } from '@capacitor/core';
 import { useFarm, useNow } from '@/hooks/useFarm';
 import { calendarDays, plotZones, type NoticeCategory } from '@/domain/rules/farm';
 import { APP_VERSION } from '@/domain/contracts';
 import { settingsRepository } from '@/data/repositories';
-import { exportPack } from '@/data/actions';
+import { exportPack, syncToServer } from '@/data/actions';
 import { ScreenHeader } from '@/components/game/Shell';
 import { Icon } from '@/components/game/Icon';
 import { Loading } from '@/components/game/bits';
 import { showToast } from '@/components/game/toast';
 
 const CATEGORIES: NoticeCategory[] = ['paiol', 'talhao', 'animal', 'feira', 'bau'];
+/** A native build has no web origin to sync to, so the address must be typed */
+const NATIVE = Capacitor.isNativePlatform();
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
   const data = useFarm();
   const now = useNow();
-  const [farm, setFarm] = useState<{ name: string; contact: string } | null>(null);
+  const [farm, setFarm] = useState<{ name: string; contact: string; server: string } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
 
   useEffect(() => {
-    if (data && !farm) setFarm({ name: data.settings.farmName, contact: data.settings.contactInfo });
+    if (data && !farm) setFarm({ name: data.settings.farmName, contact: data.settings.contactInfo, server: data.settings.syncServerUrl ?? '' });
   }, [data, farm]);
   useEffect(() => {
     navigator.serviceWorker?.getRegistration().then(r => setOffline(!!r?.active)).catch(() => setOffline(false));
@@ -33,6 +36,7 @@ export default function SettingsPage() {
 
   const s = data.settings;
   const since = s.lastExportAt ? calendarDays(s.lastExportAt, now) : undefined;
+  const sinceSync = s.lastSyncAt ? calendarDays(s.lastSyncAt, now) : undefined;
   const muted = new Set(s.mutedNotifications ?? []);
   const pack = async (type: 'availability' | 'full') => {
     setBusy(type);
@@ -45,7 +49,20 @@ export default function SettingsPage() {
       setBusy(null);
     }
   };
-  const saveFarm = () => settingsRepository.update({ farmName: farm.name.trim(), contactInfo: farm.contact.trim() });
+  const sync = async () => {
+    const url = farm.server.trim() || (NATIVE ? '' : location.origin);
+    if (!url) { showToast(t('settings.syncNoServer')); return; }
+    setBusy('sync');
+    try {
+      const r = await syncToServer(url);
+      showToast(t('settings.syncDone', { count: r.records }));
+    } catch {
+      showToast(t('settings.syncError'));
+    } finally {
+      setBusy(null);
+    }
+  };
+  const saveFarm = () => settingsRepository.update({ farmName: farm.name.trim(), contactInfo: farm.contact.trim(), syncServerUrl: farm.server.trim() });
   const toggleNotice = (c: NoticeCategory) => {
     const next = new Set(muted);
     if (next.has(c)) next.delete(c); else next.add(c);
@@ -80,6 +97,20 @@ export default function SettingsPage() {
           </span>
         </button>
         <span className="kb-hint">{t('settings.chestNote')}</span>
+      </section>
+
+      <section className={group} aria-labelledby="sync-t">
+        <div className="flex flex-col">
+          <h2 id="sync-t" className="kb-h3">{t('settings.sync')}</h2>
+          <span className="text-sm leading-5">{sinceSync === undefined ? t('settings.syncNever') : t('settings.syncLast', { count: sinceSync })}</span>
+        </div>
+        <label className="flex flex-col gap-1 text-sm text-ink-muted">{t('settings.syncServer')}
+          <input className="kb-field !min-h-12 !rounded-xl !bg-surface" type="url" inputMode="url" autoCapitalize="off" autoCorrect="off" spellCheck={false} placeholder={NATIVE ? 'http://192.168.0.10:8787' : location.origin} value={farm.server} onChange={e => setFarm({ ...farm, server: e.target.value })} onBlur={saveFarm} /></label>
+        <button type="button" className={packBtn} style={{ boxShadow: '0 3px 0 var(--line)' }} onClick={sync} disabled={!!busy} aria-busy={busy === 'sync'}>
+          <span className="flex h-12 w-12 flex-none items-center justify-center rounded-[14px] bg-river-soft text-river"><Icon name="upload" /></span>
+          <span className="flex flex-1 flex-col"><span className="font-medium">{t('settings.syncNow')}</span><span className="text-[13px] leading-[18px] text-ink-muted">{t('settings.syncNowHint')}</span></span>
+        </button>
+        <span className="kb-hint">{t('settings.syncNote')}</span>
       </section>
 
       <section className={group} aria-labelledby="sitio-t">
